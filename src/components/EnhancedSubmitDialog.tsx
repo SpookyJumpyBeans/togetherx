@@ -130,8 +130,32 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     setLoading(true);
 
     try {
-      // Simulate submission (database would go here)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Insert product into database
+      const { error: insertError } = await supabase
+        .from('products')
+        .insert([{
+          user_id: user.id,
+          name: formData.name,
+          website_link: formData.websiteLink,
+          description: formData.description,
+          target_audience: formData.targetAudience,
+          category: formData.category,
+          contact_email: formData.contactEmail,
+          tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+          uses_ai: formData.usesAI,
+          tech_highlights: formData.techHighlights.split(',').map(t => t.trim()).filter(Boolean),
+          users: formData.users ? parseInt(formData.users) : null,
+          revenue: formData.revenue,
+          growth_rate: formData.growthRate,
+          co_marketing: formData.coMarketing,
+          white_label: formData.whiteLabel,
+          acquisition: formData.acquisition,
+          reseller: formData.reseller,
+          partnership: formData.partnership,
+          show_on_leaderboard: formData.showOnLeaderboard,
+        }]);
+
+      if (insertError) throw insertError;
 
       toast.success("Product submitted successfully!");
       
