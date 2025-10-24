@@ -3,7 +3,7 @@ import { Rocket, LogIn, LogOut, User, Bell, Plus, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { User as SupabaseUser } from "@supabase/supabase-js";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -65,10 +65,10 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
           </button>
 
           <nav className="flex items-center gap-6">
-            <a href="/leaderboard" className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+            <Link to="/leaderboard" className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
               <Trophy className="w-4 h-4" />
               Leaderboard
-            </a>
+            </Link>
 
             <Button 
               variant="ghost" 
