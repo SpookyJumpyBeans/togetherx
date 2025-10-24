@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ProductCard } from "@/components/ProductCard";
+import { DbProductCardWithPin } from "@/components/DbProductCardWithPin";
 import { SuccessStoryDialog } from "@/components/SuccessStoryDialog";
 import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
@@ -305,15 +305,7 @@ export default function Profile() {
             <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
               {pinnedProducts.map((product) => (
                 <div key={product.id} className="relative break-inside-avoid mb-6">
-                  <ProductCard product={product} />
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="absolute top-3 right-3 rounded-full z-10 h-8 w-8 p-0"
-                    onClick={() => handleUnpin(product.id)}
-                  >
-                    Unpin
-                  </Button>
+                  <DbProductCardWithPin product={product} />
                 </div>
               ))}
             </div>
