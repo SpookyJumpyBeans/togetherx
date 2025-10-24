@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Handshake, Rocket, LogIn, LogOut, User } from "lucide-react";
+import { Handshake, Rocket, LogIn, LogOut, User, Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -14,9 +14,10 @@ import {
 
 interface HeaderProps {
   onSubmitClick?: () => void;
+  onSubscribeClick?: () => void;
 }
 
-export const Header = ({ onSubmitClick }: HeaderProps) => {
+export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const navigate = useNavigate();
 
@@ -61,6 +62,16 @@ export const Header = ({ onSubmitClick }: HeaderProps) => {
             <a href="#products" className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Products
             </a>
+
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={onSubscribeClick}
+              className="rounded-full hidden md:flex"
+            >
+              <Bell className="w-4 h-4 mr-2" />
+              Subscribe
+            </Button>
             
             <Button 
               variant="default" 
@@ -84,6 +95,10 @@ export const Header = ({ onSubmitClick }: HeaderProps) => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <User className="w-4 h-4 mr-2" />
+                    Profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign Out

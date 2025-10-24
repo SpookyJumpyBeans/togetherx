@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 
-export const Footer = () => {
+interface FooterProps {
+  onContactClick?: () => void;
+}
+
+export const Footer = ({ onContactClick }: FooterProps) => {
   return (
     <footer className="border-t border-border/30 py-12 mt-24">
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
@@ -21,12 +25,12 @@ export const Footer = () => {
             >
               Privacy
             </Link>
-            <Link 
-              to="/contact" 
+            <button
+              onClick={onContactClick}
               className="hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-primary after:transition-all hover:after:w-full"
             >
               Contact Us
-            </Link>
+            </button>
           </div>
         </div>
       </div>

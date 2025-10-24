@@ -1,10 +1,12 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ProductCard } from "@/components/ProductCard";
+import { ProductCardWithPin } from "@/components/ProductCardWithPin";
 import { mockProducts } from "@/data/mockProducts";
-import { SubmitProductDialog } from "@/components/SubmitProductDialog";
+import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
+import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { ContactDialog } from "@/components/ContactDialog";
 import { Rocket, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,6 +21,9 @@ const Index = () => {
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
+  const [contactDialogOpen, setContactDialogOpen] = useState(false);
+  const [dateFilter, setDateFilter] = useState<string>("all");
   const [displayCount, setDisplayCount] = useState(12);
   const observerTarget = useRef(null);
 
@@ -93,7 +98,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header onSubmitClick={() => setSubmitDialogOpen(true)} />
+      <Header 
+        onSubmitClick={() => setSubmitDialogOpen(true)}
+        onSubscribeClick={() => setSubscribeDialogOpen(true)}
+      />
       
       {/* Hero Section */}
       <section className="container mx-auto px-6 md:px-8 pt-16 md:pt-24 pb-12 md:pb-16">
@@ -159,6 +167,17 @@ const Index = () => {
                   <SelectItem value="50k+">50k+ users</SelectItem>
                 </SelectContent>
               </Select>
+              <Select value={dateFilter} onValueChange={setDateFilter}>
+                <SelectTrigger className="w-full lg:w-[200px] h-12 rounded-full border-0 border-b-2 border-border/50 bg-transparent hover:border-primary/50 transition-colors focus:border-primary shadow-none px-4">
+                  <SelectValue placeholder="Submission Date" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Time</SelectItem>
+                  <SelectItem value="week">This Week</SelectItem>
+                  <SelectItem value="month">This Month</SelectItem>
+                  <SelectItem value="year">This Year</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="relative w-full lg:w-80">
@@ -180,9 +199,11 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {displayedProducts.map((product) => (
-              <div key={product.id} onClick={() => handleProductClick(product)} className="animate-fade-in">
-                <ProductCard product={product} />
-              </div>
+              <ProductCardWithPin
+                key={product.id}
+                product={product}
+                onClick={() => handleProductClick(product)}
+              />
             ))}
           </div>
 
@@ -200,10 +221,12 @@ const Index = () => {
         </div>
       </section>
 
-      <Footer />
+      <Footer onContactClick={() => setContactDialogOpen(true)} />
 
-      <SubmitProductDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen} />
-      <ProductDetailDialog 
+      <EnhancedSubmitDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen} />
+      <SubscribeDialog open={subscribeDialogOpen} onOpenChange={setSubscribeDialogOpen} />
+      <ContactDialog open={contactDialogOpen} onOpenChange={setContactDialogOpen} />
+      <ProductDetailDialog
         product={selectedProduct} 
         open={detailDialogOpen} 
         onOpenChange={setDetailDialogOpen} 
