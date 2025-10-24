@@ -58,7 +58,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
   useEffect(() => {
     checkUser();
     loadSavedFormData();
-  }, []);
+  }, [open]);
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -75,6 +75,8 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
       growthFile: null,
     };
     localStorage.setItem('submitProductFormData', JSON.stringify(dataToSave));
+    // Also store that we want to auto-submit after auth
+    localStorage.setItem('auto_submit_after_auth', 'true');
   };
 
   const loadSavedFormData = () => {
@@ -128,15 +130,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
-      saveFormData();
-      toast.error("Please sign in to submit a product");
-      onOpenChange(false);
-      setTimeout(() => navigate("/auth"), 100);
-      return;
-    }
-    
-    // Validate required fields
+    // Validate required fields first
     const result = formSchema.safeParse({
       name: formData.name,
       websiteLink: formData.websiteLink,
@@ -159,6 +153,22 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
       formData.acquisition;
     if (!openToSelected) {
       toast.error("Please select at least one option in 'Open To'.");
+      return;
+    }
+
+    // Check if user is authenticated after validation
+    if (!user) {
+      saveFormData();
+      toast.info("Please sign in to submit your product");
+      onOpenChange(false);
+      
+      // Navigate to auth with return params
+      const currentPath = window.location.pathname;
+      localStorage.setItem('auth_return_to', currentPath);
+      localStorage.setItem('auth_open_submit', 'true');
+      setTimeout(() => {
+        navigate(`/auth?returnTo=${encodeURIComponent(currentPath)}&openSubmit=true`);
+      }, 100);
       return;
     }
 
@@ -195,6 +205,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
       toast.success("Product submitted successfully!");
       
       clearSavedFormData();
+      localStorage.removeItem('auto_submit_after_auth');
       onOpenChange(false);
       setFormData({
         name: "",

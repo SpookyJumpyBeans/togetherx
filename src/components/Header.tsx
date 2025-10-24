@@ -43,17 +43,6 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
     navigate("/");
   };
 
-  const handleSubmitClick = () => {
-    if (!user) {
-      // Store current state before redirecting to auth
-      localStorage.setItem('auth_return_to', location.pathname);
-      localStorage.setItem('auth_open_submit', 'true');
-      navigate(`/auth?returnTo=${encodeURIComponent(location.pathname)}&openSubmit=true`);
-    } else {
-      onSubmitClick?.();
-    }
-  };
-
   return (
     <header className="border-b border-border/50 bg-background/95 backdrop-blur-md sticky top-0 z-50">
       <div className="container mx-auto px-4 md:px-6 py-4">
@@ -90,7 +79,7 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
               variant="default" 
               size="sm" 
               className="rounded-full bg-foreground text-background hover:bg-foreground/90"
-              onClick={handleSubmitClick}
+              onClick={onSubmitClick}
             >
               <Plus className="w-4 h-4 md:mr-2" />
               <span className="hidden md:inline">Submit Product</span>

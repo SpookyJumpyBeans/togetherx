@@ -29,7 +29,16 @@ const Index = () => {
 
   // Listen for custom event to reopen submit dialog after auth
   useEffect(() => {
-    const handleOpenSubmit = () => setSubmitDialogOpen(true);
+    const handleOpenSubmit = () => {
+      setSubmitDialogOpen(true);
+      
+      // Check if we should auto-submit (user filled form before auth)
+      const autoSubmit = localStorage.getItem('auto_submit_after_auth');
+      if (autoSubmit === 'true') {
+        // Auto-submit will be handled by the dialog itself when it detects the user is now logged in
+        // The form data is already loaded via localStorage in EnhancedSubmitDialog
+      }
+    };
     window.addEventListener('openSubmitDialog', handleOpenSubmit);
     return () => window.removeEventListener('openSubmitDialog', handleOpenSubmit);
   }, []);
