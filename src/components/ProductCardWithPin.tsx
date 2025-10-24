@@ -79,92 +79,42 @@ export const ProductCardWithPin = ({ product, onClick }: ProductCardWithPinProps
   };
 
   return (
-    <div className="relative break-inside-avoid mb-6">
+    <div className="relative">
       <Card 
         onClick={onClick}
-        className="group hover:shadow-lg transition-all duration-300 border border-border/50 hover:border-border bg-card overflow-hidden cursor-pointer rounded-2xl"
+        className="group hover:shadow-xl transition-all duration-300 border border-border bg-card overflow-hidden cursor-pointer rounded-xl h-full flex flex-col"
       >
-        <CardContent className="p-0">
+        <CardContent className="p-0 flex flex-col h-full">
           {/* Product Image */}
           {product.image && (
-            <div className="w-full aspect-[4/3] overflow-hidden bg-muted/10">
+            <div className="w-full aspect-[4/3] overflow-hidden bg-muted/10 relative">
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover"
               />
+              {/* Badges on Image */}
+              <div className="absolute top-3 left-3 flex gap-2">
+                {product.usesAI && (
+                  <div className="bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    <span className="text-xs font-medium">AI</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
           
-          <div className="p-5 space-y-4">
-            {/* Logo & Name */}
-            <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-xl bg-muted/30 flex items-center justify-center flex-shrink-0">
-                <img
-                  src={product.logo}
-                  alt={product.name}
-                  className="w-8 h-8 object-contain"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-base leading-tight line-clamp-2">
-                    {product.name}
-                  </h3>
-                  {product.usesAI && (
-                    <Badge variant="secondary" className="text-xs px-2 py-0 h-5">
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      AI
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground line-clamp-2 leading-snug mt-1">
-                  {product.description}
-                </p>
-              </div>
-            </div>
-          
-            {/* Traction - Simplified */}
-            {(product.traction.users || product.traction.mau) && (
-              <div className="flex items-center gap-4 text-sm">
-                {product.traction.users && (
-                  <div className="flex items-center gap-1.5 text-muted-foreground">
-                    <Users className="w-3.5 h-3.5" />
-                    <span>{product.traction.users >= 1000 ? `${(product.traction.users / 1000).toFixed(1)}k` : product.traction.users}</span>
-                  </div>
-                )}
-                {product.traction.mau && (
-                  <div className="flex items-center gap-1.5 text-muted-foreground">
-                    <Activity className="w-3.5 h-3.5" />
-                    <span>{product.traction.mau >= 1000 ? `${(product.traction.mau / 1000).toFixed(1)}k` : product.traction.mau} MAU</span>
-                  </div>
-                )}
-              </div>
-            )}
-          
-            {/* Partnership Badges - Minimal */}
-            <div className="flex flex-wrap gap-1.5">
-              {product.partnerships.coMarketing && (
-                <Badge variant="outline" className="text-xs px-2 py-0 h-6 border-warning/20 text-warning">
-                  Co-Marketing
-                </Badge>
-              )}
-              {product.partnerships.whiteLabel && (
-                <Badge variant="outline" className="text-xs px-2 py-0 h-6 border-whitelabel/20 text-whitelabel">
-                  White Label
-                </Badge>
-              )}
-              {product.partnerships.acquisition && (
-                <Badge variant="outline" className="text-xs px-2 py-0 h-6 border-acquisition/20 text-acquisition">
-                  Acquisition
-                </Badge>
-              )}
-              {product.partnerships.reseller && (
-                <Badge variant="outline" className="text-xs px-2 py-0 h-6 border-reseller/20 text-reseller">
-                  Reseller
-                </Badge>
-              )}
-            </div>
+          <div className="p-5 flex-1 flex flex-col">
+            {/* Product Name */}
+            <h3 className="font-semibold text-base leading-tight mb-2">
+              {product.name}
+            </h3>
+            
+            {/* Description */}
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed flex-1">
+              {product.description}
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -176,9 +126,9 @@ export const ProductCardWithPin = ({ product, onClick }: ProductCardWithPinProps
           disabled={loading}
           size="sm"
           variant={isPinned ? "default" : "secondary"}
-          className="absolute top-3 right-3 rounded-full shadow-md z-10 h-8 w-8 p-0"
+          className="absolute top-3 right-3 rounded-full shadow-lg z-10 h-9 w-9 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
         >
-          <Pin className={`w-3.5 h-3.5 ${isPinned ? "fill-current" : ""}`} />
+          <Pin className={`w-4 h-4 ${isPinned ? "fill-current" : ""}`} />
         </Button>
       )}
     </div>
