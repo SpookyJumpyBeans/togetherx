@@ -1,6 +1,15 @@
 -- Run these in your database if not already applied
 
 -- 1) Product Contacts Table - Track founder contact clicks for leaderboard
+-- Create immutable date_trunc wrapper for unique index
+create or replace function public.immutable_date_trunc_month(timestamp with time zone)
+returns timestamp with time zone
+language sql
+immutable
+as $$
+  select date_trunc('month', $1);
+$$;
+
 -- Unique contacts per user per product per month
 create table if not exists public.product_contacts (
   id uuid primary key default gen_random_uuid(),
@@ -11,7 +20,7 @@ create table if not exists public.product_contacts (
 
 -- Create unique index to enforce one contact per user per product per month
 create unique index if not exists idx_product_contacts_unique_monthly
-  on public.product_contacts (product_id, user_id, date_trunc('month', contacted_at));
+  on public.product_contacts (product_id, user_id, immutable_date_trunc_month(contacted_at));
 
 -- Enable RLS
 alter table public.product_contacts enable row level security;
