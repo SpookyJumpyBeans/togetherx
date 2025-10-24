@@ -86,7 +86,7 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
             </Button>
 
             {user ? (
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="rounded-full h-9 w-9 p-0">
                     <Avatar className="h-8 w-8">
