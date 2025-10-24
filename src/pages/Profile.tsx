@@ -54,7 +54,12 @@ export default function Profile() {
       .from("profiles")
       .select("*")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
+
+    if (error) {
+      console.error("Profile load error:", error);
+      toast.error("Failed to load profile");
+    }
 
     if (data) {
       setProfile({
@@ -98,12 +103,12 @@ export default function Profile() {
         twitter: profile.twitter,
         website: profile.website,
         github: profile.github,
-        updated_at: new Date().toISOString(),
       })
       .eq("id", user.id);
 
     if (error) {
-      toast.error("Failed to save profile");
+      console.error("Profile save error:", error);
+      toast.error(`Failed to save profile: ${error.message}`);
     } else {
       toast.success("Profile saved successfully");
     }
