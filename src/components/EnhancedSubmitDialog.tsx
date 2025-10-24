@@ -50,6 +50,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
   // Validation schema
   const formSchema = z.object({
     name: z.string().trim().min(1, "Product name is required"),
+    websiteLink: z.string().trim().url({ message: "Valid website link required" }),
     description: z.string().trim().min(1, "Description is required"),
     contactEmail: z.string().trim().email("Valid contact email required"),
   });
@@ -138,6 +139,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     // Validate required fields
     const result = formSchema.safeParse({
       name: formData.name,
+      websiteLink: formData.websiteLink,
       description: formData.description,
       contactEmail: formData.contactEmail,
     });
@@ -147,6 +149,16 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     }
     if (!formData.screenshot) {
       toast.error("Please add a product screenshot.");
+      return;
+    }
+    const openToSelected =
+      formData.partnership ||
+      formData.coMarketing ||
+      formData.whiteLabel ||
+      formData.reseller ||
+      formData.acquisition;
+    if (!openToSelected) {
+      toast.error("Please select at least one option in 'Open To'.");
       return;
     }
 
@@ -241,7 +253,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
 
           {/* Website Link */}
           <div className="space-y-2">
-            <Label htmlFor="websiteLink" className="text-base">Website Link</Label>
+            <Label htmlFor="websiteLink" className="text-base">Website Link *</Label>
             <Input
               id="websiteLink"
               type="url"
@@ -464,7 +476,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
 
           {/* Open To */}
           <div className="space-y-4 pt-6 border-t">
-            <h3 className="text-xl font-semibold">Open To</h3>
+            <h3 className="text-xl font-semibold">Open To *</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
                 <Checkbox
