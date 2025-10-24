@@ -58,7 +58,15 @@ const Index = () => {
         .eq('approval_status','approved')
         .order('created_at', { ascending: false })
         .limit(8);
-      if (!error && mounted) setApprovedProducts(data || []);
+      
+      if (error) {
+        console.error('Error loading approved products:', error);
+      }
+      
+      if (!error && mounted && data) {
+        console.log('Loaded approved products:', data);
+        setApprovedProducts(data);
+      }
     })();
     return () => { mounted = false; };
   }, []);
