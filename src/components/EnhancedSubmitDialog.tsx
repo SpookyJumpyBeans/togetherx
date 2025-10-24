@@ -30,6 +30,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     users: "",
     mau: "",
     revenue: "",
+    showOnLeaderboard: false,
     verificationScreenshots: [] as File[],
     coMarketing: false,
     whiteLabel: false,
@@ -142,6 +143,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
           white_label: formData.whiteLabel,
           acquisition: formData.acquisition,
           reseller: formData.reseller,
+          show_on_leaderboard: formData.showOnLeaderboard,
         }]);
 
       if (insertError) throw insertError;
@@ -166,6 +168,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
         users: "",
         mau: "",
         revenue: "",
+        showOnLeaderboard: false,
         verificationScreenshots: [],
         coMarketing: false,
         whiteLabel: false,
@@ -339,7 +342,21 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
             </div>
 
             {(formData.users || formData.mau || formData.revenue) && (
-              <div>
+              <>
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="showOnLeaderboard"
+                    checked={formData.showOnLeaderboard}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, showOnLeaderboard: checked as boolean })
+                    }
+                  />
+                  <Label htmlFor="showOnLeaderboard" className="cursor-pointer font-normal">
+                    Opt in to be featured on the Traction Leaderboard
+                  </Label>
+                </div>
+
+                <div>
                 <Label className="text-sm font-medium mb-3 block flex items-center gap-2">
                   <Shield className="w-4 h-4 text-primary" />
                   Verification Screenshots (Required for Traction Metrics) *
@@ -370,6 +387,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
                   </div>
                 </label>
               </div>
+              </>
             )}
           </div>
 

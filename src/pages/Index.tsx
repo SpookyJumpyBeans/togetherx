@@ -7,6 +7,7 @@ import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { ContactDialog } from "@/components/ContactDialog";
+import { TractionLeaderboard } from "@/components/TractionLeaderboard";
 import { Rocket, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -104,10 +105,10 @@ const Index = () => {
       />
       
       {/* Hero Section */}
-      <section className="container mx-auto px-6 md:px-8 pt-16 md:pt-24 pb-12 md:pb-16">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
-            A community where founders{" "}
+      <section className="container mx-auto px-6 md:px-8 pt-20 md:pt-28 pb-16 md:pb-20">
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
+            Where founders{" "}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
               scale together
             </span>
@@ -115,14 +116,24 @@ const Index = () => {
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Discover partnership opportunities — co-marketing, white-label, acquisitions, and more.
           </p>
-          <Button 
-            size="lg" 
-            className="gap-2 rounded-full shadow-lg hover:shadow-xl transition-all px-8 py-6 text-base"
-            onClick={() => setSubmitDialogOpen(true)}
-          >
-            <Rocket className="w-5 h-5" />
-            Submit Your Product
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button 
+              size="lg" 
+              className="gap-2 rounded-full shadow-lg hover:shadow-xl transition-all px-8 h-12 text-base"
+              onClick={() => setSubmitDialogOpen(true)}
+            >
+              <Rocket className="w-5 h-5" />
+              Submit Your Product
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="gap-2 rounded-full px-8 h-12 text-base"
+              onClick={() => window.location.href = "#leaderboard"}
+            >
+              View Leaderboard
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -191,6 +202,19 @@ const Index = () => {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Traction Leaderboard Section */}
+      <section id="leaderboard" className="container mx-auto px-6 md:px-8 py-16 bg-muted/30">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Traction Leaderboard</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Fastest-growing products in the community
+            </p>
+          </div>
+          <TractionLeaderboard />
         </div>
       </section>
 

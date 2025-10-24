@@ -6,16 +6,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ProductCard } from "@/components/ProductCard";
+import { SuccessStoryDialog } from "@/components/SuccessStoryDialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { User, Save, Pin } from "lucide-react";
+import { User, Save, Pin, Trophy, Linkedin, Github, Globe, Twitter } from "lucide-react";
 
 export default function Profile() {
   const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState({ name: "", role: "", email: "" });
+  const [profile, setProfile] = useState({
+    name: "",
+    role: "",
+    email: "",
+    linkedin: "",
+    twitter: "",
+    website: "",
+    github: "",
+  });
   const [pinnedProducts, setPinnedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [storyDialogOpen, setStoryDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,6 +57,10 @@ export default function Profile() {
         name: data.name || "",
         role: data.role || "",
         email: data.email || "",
+        linkedin: data.linkedin || "",
+        twitter: data.twitter || "",
+        website: data.website || "",
+        github: data.github || "",
       });
     }
     setLoading(false);
@@ -76,6 +90,10 @@ export default function Profile() {
         name: profile.name,
         role: profile.role,
         email: profile.email,
+        linkedin: profile.linkedin,
+        twitter: profile.twitter,
+        website: profile.website,
+        github: profile.github,
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id);
@@ -119,7 +137,7 @@ export default function Profile() {
         {/* Profile Section */}
         <section className="mb-16">
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center">
               <User className="w-8 h-8 text-primary-foreground" />
             </div>
             <div>
@@ -169,15 +187,89 @@ export default function Profile() {
               />
             </div>
 
-            <Button
-              onClick={handleSaveProfile}
-              disabled={saving}
-              className="rounded-full px-8"
-              size="lg"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {saving ? "Saving..." : "Save Profile"}
-            </Button>
+            {/* Social Links */}
+            <div className="pt-6 border-t border-border/30">
+              <h3 className="text-lg font-semibold mb-6">Social Links</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="linkedin" className="text-sm font-medium mb-2 block flex items-center gap-2">
+                    <Linkedin className="w-4 h-4 text-primary" />
+                    LinkedIn
+                  </Label>
+                  <Input
+                    id="linkedin"
+                    value={profile.linkedin}
+                    onChange={(e) => setProfile({ ...profile, linkedin: e.target.value })}
+                    placeholder="https://linkedin.com/in/yourprofile"
+                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="twitter" className="text-sm font-medium mb-2 block flex items-center gap-2">
+                    <Twitter className="w-4 h-4 text-primary" />
+                    Twitter/X
+                  </Label>
+                  <Input
+                    id="twitter"
+                    value={profile.twitter}
+                    onChange={(e) => setProfile({ ...profile, twitter: e.target.value })}
+                    placeholder="https://twitter.com/yourhandle"
+                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="website" className="text-sm font-medium mb-2 block flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-primary" />
+                    Website
+                  </Label>
+                  <Input
+                    id="website"
+                    value={profile.website}
+                    onChange={(e) => setProfile({ ...profile, website: e.target.value })}
+                    placeholder="https://yourwebsite.com"
+                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="github" className="text-sm font-medium mb-2 block flex items-center gap-2">
+                    <Github className="w-4 h-4 text-primary" />
+                    GitHub
+                  </Label>
+                  <Input
+                    id="github"
+                    value={profile.github}
+                    onChange={(e) => setProfile({ ...profile, github: e.target.value })}
+                    placeholder="https://github.com/yourusername"
+                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <Button
+                onClick={handleSaveProfile}
+                disabled={saving}
+                className="rounded-full px-8"
+                size="lg"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {saving ? "Saving..." : "Save Profile"}
+              </Button>
+
+              <Button
+                onClick={() => setStoryDialogOpen(true)}
+                variant="outline"
+                className="rounded-full px-8"
+                size="lg"
+              >
+                <Trophy className="w-4 h-4 mr-2" />
+                Share Success Story
+              </Button>
+            </div>
           </div>
         </section>
 
@@ -217,6 +309,8 @@ export default function Profile() {
       </main>
 
       <Footer />
+
+      <SuccessStoryDialog open={storyDialogOpen} onOpenChange={setStoryDialogOpen} />
     </div>
   );
 }
