@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Handshake, Rocket, LogIn, LogOut, User, Bell } from "lucide-react";
+import { Rocket, LogIn, LogOut, User, Bell, Plus, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -49,20 +49,21 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
     <header className="border-b border-border/50 bg-background/95 backdrop-blur-md sticky top-0 z-50">
       <div className="container mx-auto px-4 md:px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-xl flex items-center justify-center shadow-sm">
-              <Handshake className="w-5 h-5 text-primary-foreground" />
+          <button 
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <div className="w-8 h-8 bg-foreground rounded-xl flex items-center justify-center shadow-sm">
+              <Rocket className="w-5 h-5 text-background" />
             </div>
             <span className="text-xl font-semibold tracking-tight">
               TogetherX
             </span>
-          </div>
+          </button>
 
           <nav className="flex items-center gap-6">
-            <a href="/" className="hidden md:block text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
-              Products
-            </a>
-            <a href="/leaderboard" className="hidden md:block text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+            <a href="/leaderboard" className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+              <Trophy className="w-4 h-4" />
               Leaderboard
             </a>
 
@@ -82,8 +83,8 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
               className="rounded-full bg-foreground text-background hover:bg-foreground/90"
               onClick={handleSubmitClick}
             >
-              <Rocket className="w-4 h-4 md:mr-2" />
-              <span className="hidden md:inline">Submit</span>
+              <Plus className="w-4 h-4 md:mr-2" />
+              <span className="hidden md:inline">Submit Product</span>
             </Button>
 
             {user ? (

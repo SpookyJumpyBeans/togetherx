@@ -7,7 +7,7 @@ import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { ContactDialog } from "@/components/ContactDialog";
-import { Rocket } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
@@ -108,7 +108,7 @@ const Index = () => {
         <div className="container mx-auto px-6 md:px-8">
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background border border-border text-sm">
-              <Rocket className="w-4 h-4" />
+              <Sparkles className="w-4 h-4" />
               Partnership marketplace for founders
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
