@@ -1,12 +1,41 @@
 -- Run these in your database if not already applied
 
--- 1) Ensure products table has updated_at managed by trigger (optional)
--- If you want automatic timestamps, create columns and trigger:
--- alter table public.products add column if not exists updated_at timestamptz default now();
--- create or replace function public.set_updated_at()
--- returns trigger language plpgsql as $$ begin new.updated_at = now(); return new; end; $$;
--- drop trigger if exists trg_products_updated_at on public.products;
--- create trigger trg_products_updated_at before update on public.products for each row execute procedure public.set_updated_at();
+-- 1) Product Contacts Table - Track founder contact clicks for leaderboard
+-- Unique contacts per user per product per month
+create table if not exists public.product_contacts (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid references public.products(id) on delete cascade not null,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  contacted_at timestamp with time zone default now() not null,
+  -- Unique constraint: one contact per user per product per month
+  unique (product_id, user_id, date_trunc('month', contacted_at))
+);
+
+-- Enable RLS
+alter table public.product_contacts enable row level security;
+
+-- RLS Policies for product_contacts
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'product_contacts' and policyname = 'Users can view their own contacts'
+  ) then
+    create policy "Users can view their own contacts" on public.product_contacts
+      for select to authenticated using (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'product_contacts' and policyname = 'Authenticated users can insert contacts'
+  ) then
+    create policy "Authenticated users can insert contacts" on public.product_contacts
+      for insert to authenticated with check (auth.uid() = user_id);
+  end if;
+end $$;
+
+-- Index for faster leaderboard queries
+create index if not exists idx_product_contacts_month 
+  on public.product_contacts (product_id, date_trunc('month', contacted_at));
+
+create index if not exists idx_product_contacts_product 
+  on public.product_contacts (product_id, contacted_at desc);
 
 -- 2) Pinned products table and policies
 create table if not exists public.pinned_products (

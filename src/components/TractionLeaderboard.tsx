@@ -2,18 +2,13 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Users, Activity } from "lucide-react";
+import { TrendingUp, Mail, Trophy } from "lucide-react";
 
 interface LeaderboardEntry {
   id: string;
   name: string;
-  logo: string;
-  image?: string;
-  category: string;
-  users?: number;
-  mau?: number;
-  revenue?: string;
-  growth_rate?: number;
+  category?: string;
+  monthly_contacts: number;
 }
 
 export const TractionLeaderboard = () => {
@@ -25,16 +20,55 @@ export const TractionLeaderboard = () => {
   }, []);
 
   const loadLeaderboard = async () => {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('status', 'approved')
-      .eq('show_on_leaderboard', true)
-      .order('users', { ascending: false })
-      .limit(10);
+    // Get current month's start date
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-    if (data) {
-      setLeaderboard(data);
+    // Count contacts per product for current month
+    const { data: contactData, error: contactError } = await supabase
+      .from('product_contacts')
+      .select('product_id')
+      .gte('contacted_at', monthStart);
+
+    if (contactError) {
+      console.error('Error loading contacts:', contactError);
+      setLoading(false);
+      return;
+    }
+
+    // Count contacts by product
+    const contactCounts: Record<string, number> = {};
+    contactData?.forEach((contact: any) => {
+      contactCounts[contact.product_id] = (contactCounts[contact.product_id] || 0) + 1;
+    });
+
+    // Get product details for those with contacts
+    const productIds = Object.keys(contactCounts);
+    if (productIds.length === 0) {
+      setLeaderboard([]);
+      setLoading(false);
+      return;
+    }
+
+    const { data: products, error: productsError } = await supabase
+      .from('products')
+      .select('id, name, category')
+      .eq('approval_status', 'approved')
+      .in('id', productIds);
+
+    if (!productsError && products) {
+      // Combine and sort
+      const combined = products
+        .map(p => ({
+          id: p.id,
+          name: p.name,
+          category: p.category,
+          monthly_contacts: contactCounts[p.id] || 0,
+        }))
+        .sort((a, b) => b.monthly_contacts - a.monthly_contacts)
+        .slice(0, 10);
+      
+      setLeaderboard(combined);
     }
     setLoading(false);
   };
@@ -43,7 +77,7 @@ export const TractionLeaderboard = () => {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 bg-muted/20 rounded-2xl animate-pulse" />
+          <div key={i} className="h-32 bg-muted/20 rounded-2xl animate-pulse" />
         ))}
       </div>
     );
@@ -51,82 +85,59 @@ export const TractionLeaderboard = () => {
 
   if (leaderboard.length === 0) {
     return (
-      <div className="text-center py-12 border-2 border-dashed border-border/30 rounded-3xl">
-        <TrendingUp className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-        <p className="text-muted-foreground">No products on the leaderboard yet</p>
+      <div className="text-center py-20 border-2 border-dashed border-border/30 rounded-3xl">
+        <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+        <p className="text-muted-foreground text-lg">No products contacted this month yet</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          Be the first to reach out to founders!
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {leaderboard.map((product, index) => (
-        <Card key={product.id} className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm">
-          <CardContent className="p-6">
+        <Card
+          key={product.id}
+          className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+        >
+          <CardContent className="p-8">
             <div className="flex items-center gap-6">
-              {/* Rank */}
-              <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">
-                  {index + 1}
-                </span>
+              {/* Rank Badge */}
+              <div
+                className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold flex-shrink-0 ${
+                  index === 0
+                    ? "bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-lg"
+                    : index === 1
+                    ? "bg-gradient-to-br from-gray-300 to-gray-500 text-white shadow-md"
+                    : index === 2
+                    ? "bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-md"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {index + 1}
               </div>
 
               {/* Product Info */}
-              <div className="flex-1 flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-muted/20 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={product.logo}
-                    alt={product.name}
-                    className="w-10 h-10 object-contain"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                  <Badge variant="secondary" className="text-xs">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-xl mb-1 truncate">{product.name}</h3>
+                {product.category && (
+                  <Badge variant="secondary" className="text-xs rounded-full">
                     {product.category}
                   </Badge>
-                </div>
+                )}
               </div>
 
-              {/* Metrics */}
-              <div className="hidden md:flex items-center gap-8">
-                {product.users && (
-                  <div className="text-center">
-                    <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                      <Users className="w-4 h-4" />
-                      <span className="text-xs">Users</span>
-                    </div>
-                    <p className="text-xl font-bold">
-                      {product.users >= 1000
-                        ? `${(product.users / 1000).toFixed(1)}k`
-                        : product.users}
-                    </p>
-                  </div>
-                )}
-                {product.mau && (
-                  <div className="text-center">
-                    <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                      <Activity className="w-4 h-4" />
-                      <span className="text-xs">MAU</span>
-                    </div>
-                    <p className="text-xl font-bold">
-                      {product.mau >= 1000
-                        ? `${(product.mau / 1000).toFixed(1)}k`
-                        : product.mau}
-                    </p>
-                  </div>
-                )}
-                {product.growth_rate && (
-                  <div className="text-center">
-                    <div className="flex items-center gap-2 text-success mb-1">
-                      <TrendingUp className="w-4 h-4" />
-                      <span className="text-xs">Growth</span>
-                    </div>
-                    <p className="text-xl font-bold text-success">
-                      +{product.growth_rate}%
-                    </p>
-                  </div>
-                )}
+              {/* Monthly Contacts Metric */}
+              <div className="text-center">
+                <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                  <Mail className="w-4 h-4" />
+                  <span className="text-xs">Monthly Contacts</span>
+                </div>
+                <p className="text-3xl font-bold text-primary">
+                  {product.monthly_contacts}
+                </p>
               </div>
             </div>
           </CardContent>

@@ -13,7 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Product } from "@/components/ProductCard";
 import { supabase } from "@/lib/supabase";
-import { DbProductCardWithPin } from "@/components/DbProductCardWithPin";
+import { DbProductCardWithPin, DbProduct } from "@/components/DbProductCardWithPin";
+import { DbProductDetailDialog } from "@/components/DbProductDetailDialog";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,7 +23,9 @@ const Index = () => {
   const [userFilter, setUserFilter] = useState<string>("all");
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedDbProduct, setSelectedDbProduct] = useState<DbProduct | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [dbDetailDialogOpen, setDbDetailDialogOpen] = useState(false);
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
   const [contactDialogOpen, setContactDialogOpen] = useState(false);
   const [dateFilter, setDateFilter] = useState<string>("all");
@@ -51,7 +54,7 @@ const Index = () => {
     (async () => {
       const { data, error } = await supabase
         .from('products')
-        .select('id,name,description,website_link')
+        .select('id,name,description,website_link,category,uses_ai,target_audience')
         .eq('approval_status','approved')
         .order('created_at', { ascending: false })
         .limit(8);
@@ -127,6 +130,11 @@ const Index = () => {
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
     setDetailDialogOpen(true);
+  };
+
+  const handleDbProductClick = (product: DbProduct) => {
+    setSelectedDbProduct(product);
+    setDbDetailDialogOpen(true);
   };
 
   return (
@@ -229,7 +237,8 @@ const Index = () => {
               {approvedProducts.map((p) => (
                 <DbProductCardWithPin
                   key={p.id}
-                  product={{ id: p.id, name: p.name, description: p.description, website_link: p.website_link }}
+                  product={p}
+                  onClick={() => handleDbProductClick(p)}
                 />
               ))}
             </div>
@@ -273,6 +282,11 @@ const Index = () => {
         product={selectedProduct} 
         open={detailDialogOpen} 
         onOpenChange={setDetailDialogOpen} 
+      />
+      <DbProductDetailDialog
+        product={selectedDbProduct}
+        open={dbDetailDialogOpen}
+        onOpenChange={setDbDetailDialogOpen}
       />
     </div>
   );
