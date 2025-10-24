@@ -12,11 +12,6 @@ export interface DbProduct {
   description?: string;
   website_link?: string;
   contact_email?: string;
-  category?: string;
-  target_audience?: string;
-  tags?: string;
-  uses_ai?: boolean;
-  tech_highlights?: string;
   created_at?: string;
 }
 
@@ -83,9 +78,6 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
 
   if (!product) return null;
 
-  const tags = product.tags ? product.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
-  const techHighlights = product.tech_highlights ? product.tech_highlights.split(',').map(t => t.trim()).filter(Boolean) : [];
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto border-0 shadow-2xl">
@@ -94,25 +86,7 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
           <div className="space-y-4">
             <div className="flex items-center gap-3 flex-wrap">
               <h2 className="text-3xl font-bold">{product.name}</h2>
-              {product.uses_ai && (
-                <Badge variant="default" className="gap-1 rounded-full">
-                  <span className="text-xs">✨</span>
-                  AI-Powered
-                </Badge>
-              )}
             </div>
-            
-            {product.category && (
-              <Badge variant="secondary" className="rounded-full">
-                {product.category}
-              </Badge>
-            )}
-
-            {product.target_audience && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <span className="text-sm">Target: {product.target_audience}</span>
-              </div>
-            )}
 
             {product.description && (
               <p className="text-muted-foreground leading-relaxed text-base">
@@ -120,34 +94,6 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
               </p>
             )}
           </div>
-
-          {/* Tags */}
-          {tags.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Keywords</h3>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag, idx) => (
-                  <Badge key={idx} variant="outline" className="rounded-full px-4 py-1.5">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Technology Highlights */}
-          {techHighlights.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Technology Stack</h3>
-              <div className="flex flex-wrap gap-2">
-                {techHighlights.map((tech, idx) => (
-                  <Badge key={idx} variant="outline" className="rounded-full px-4 py-1.5">
-                    {tech}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Website Link */}
           {product.website_link && (

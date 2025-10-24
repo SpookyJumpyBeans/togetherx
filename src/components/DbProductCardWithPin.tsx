@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Pin, Sparkles } from "lucide-react";
+import { Pin } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -11,9 +10,8 @@ export interface DbProduct {
   name: string;
   description?: string;
   website_link?: string;
-  category?: string;
-  uses_ai?: boolean;
-  target_audience?: string;
+  contact_email?: string;
+  created_at?: string;
 }
 
 interface Props {
@@ -97,18 +95,7 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
               <h3 className="font-semibold text-xl group-hover:text-primary transition-colors line-clamp-1">
                 {product.name}
               </h3>
-              {product.uses_ai && (
-                <Badge variant="default" className="gap-1 text-xs rounded-full px-2.5 py-0.5 shadow-sm">
-                  <Sparkles className="w-3 h-3" />
-                  AI
-                </Badge>
-              )}
             </div>
-            {product.category && (
-              <Badge variant="secondary" className="rounded-full text-xs mb-3">
-                {product.category}
-              </Badge>
-            )}
             {product.description && (
               <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                 {product.description}
@@ -128,15 +115,6 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
             </Button>
           )}
         </div>
-
-        {/* Target Audience */}
-        {product.target_audience && (
-          <div className="pt-4 border-t border-border/30">
-            <p className="text-xs text-muted-foreground">
-              Target: {product.target_audience}
-            </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
