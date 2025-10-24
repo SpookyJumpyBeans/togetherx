@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Rocket, LogIn, LogOut, User, Bell, Plus, Trophy } from "lucide-react";
+import { Rocket, LogIn, LogOut, User, Bell, Plus, Trophy, CheckSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -19,6 +19,7 @@ interface HeaderProps {
 
 export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,15 +29,34 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        checkAdminRole(session.user.id);
+      } else {
+        setIsAdmin(false);
+      }
     });
 
     // Then fetch any existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        checkAdminRole(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const checkAdminRole = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    
+    setIsAdmin(!!data);
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -65,7 +85,14 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
               Leaderboard
             </Link>
 
-            <Button 
+            {isAdmin && (
+              <Link to="/approvals" className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+                <CheckSquare className="w-4 h-4" />
+                Approvals
+              </Link>
+            )}
+
+            <Button
               variant="ghost" 
               size="sm"
               onClick={onSubscribeClick}
