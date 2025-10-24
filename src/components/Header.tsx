@@ -22,13 +22,15 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
+    // Subscribe first to avoid missing the initial SIGNED_IN event on redirects
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Then fetch any existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
 
