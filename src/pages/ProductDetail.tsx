@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TractionBadge } from "@/components/TractionBadge";
 import { PartnershipBadges } from "@/components/PartnershipBadges";
-import { ArrowLeft, Mail, Building2, Tag, TrendingUp } from "lucide-react";
+import { ArrowLeft, Mail, Building2, Tag, TrendingUp, Sparkles, Code } from "lucide-react";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -41,10 +41,10 @@ const ProductDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <Card className="border-border">
+            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
               <CardHeader>
                 <div className="flex items-start gap-6">
-                  <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center flex-shrink-0 shadow-md">
+                  <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center flex-shrink-0 shadow-md">
                     <img
                       src={product.logo}
                       alt={product.name}
@@ -52,7 +52,15 @@ const ProductDetail = () => {
                     />
                   </div>
                   <div className="flex-1">
-                    <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+                    <div className="flex items-center gap-3 mb-2">
+                      <h1 className="text-3xl font-semibold">{product.name}</h1>
+                      {product.usesAI && (
+                        <Badge variant="default" className="gap-1 rounded-full">
+                          <Sparkles className="w-3 h-3" />
+                          AI-Powered
+                        </Badge>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 text-muted-foreground mb-4">
                       <Building2 className="w-4 h-4" />
                       <span>{product.targetAudience}</span>
@@ -86,7 +94,25 @@ const ProductDetail = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-border">
+            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="w-5 h-5" />
+                  Technology Highlights
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {product.techHighlights.map((tech) => (
+                    <Badge key={tech} variant="outline" className="rounded-full">
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
@@ -96,21 +122,21 @@ const ProductDetail = () => {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {product.traction.users && (
-                    <div className="bg-muted/50 rounded-lg p-4">
+                    <div className="bg-muted/50 rounded-2xl p-4">
                       <p className="text-sm text-muted-foreground mb-1">Total Users</p>
-                      <p className="text-2xl font-bold">{product.traction.users.toLocaleString()}</p>
+                      <p className="text-2xl font-semibold">{product.traction.users.toLocaleString()}</p>
                     </div>
                   )}
                   {product.traction.mau && (
-                    <div className="bg-muted/50 rounded-lg p-4">
+                    <div className="bg-muted/50 rounded-2xl p-4">
                       <p className="text-sm text-muted-foreground mb-1">Monthly Active</p>
-                      <p className="text-2xl font-bold">{product.traction.mau.toLocaleString()}</p>
+                      <p className="text-2xl font-semibold">{product.traction.mau.toLocaleString()}</p>
                     </div>
                   )}
                   {product.traction.revenue && (
-                    <div className="bg-muted/50 rounded-lg p-4">
+                    <div className="bg-muted/50 rounded-2xl p-4">
                       <p className="text-sm text-muted-foreground mb-1">Revenue</p>
-                      <p className="text-2xl font-bold">{product.traction.revenue}</p>
+                      <p className="text-2xl font-semibold">{product.traction.revenue}</p>
                     </div>
                   )}
                 </div>
@@ -119,7 +145,7 @@ const ProductDetail = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <Card className="border-border sticky top-24">
+            <Card className="border-border/50 bg-card/50 backdrop-blur-sm sticky top-24">
               <CardHeader>
                 <CardTitle>Partnership Opportunities</CardTitle>
               </CardHeader>
@@ -129,8 +155,8 @@ const ProductDetail = () => {
                   <PartnershipBadges partnerships={product.partnerships} />
                 </div>
 
-                <div className="pt-4 border-t border-border">
-                  <Button variant="hero" className="w-full" size="lg">
+                <div className="pt-4 border-t border-border/50">
+                  <Button className="w-full rounded-full shadow-lg" size="lg">
                     <Mail className="w-4 h-4 mr-2" />
                     Contact Founder
                   </Button>
@@ -139,7 +165,7 @@ const ProductDetail = () => {
                   </p>
                 </div>
 
-                <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                <div className="bg-muted/50 rounded-2xl p-4 space-y-2">
                   <h3 className="font-semibold text-sm">Quick Stats</h3>
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">

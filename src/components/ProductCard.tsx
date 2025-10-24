@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TractionBadge } from "./TractionBadge";
 import { PartnershipBadges } from "./PartnershipBadges";
-import { Building2, Users } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export interface Product {
   id: string;
@@ -13,6 +13,8 @@ export interface Product {
   targetAudience: string;
   category: string;
   tags: string[];
+  usesAI: boolean;
+  techHighlights: string[];
   traction: {
     users?: number;
     mau?: number;
@@ -33,47 +35,46 @@ interface ProductCardProps {
 export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Link to={`/product/${product.id}`}>
-      <Card className="h-full hover:shadow-lg transition-all duration-300 group border border-border hover:border-primary/50">
-        <CardHeader className="pb-4">
+      <Card className="h-full hover:shadow-xl transition-all duration-300 group border border-border/50 hover:border-primary/30 bg-card/50 backdrop-blur-sm overflow-hidden">
+        <CardContent className="p-6 space-y-4">
+          {/* Logo & Name */}
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center flex-shrink-0 group-hover:shadow-md transition-all">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
               <img
                 src={product.logo}
                 alt={product.name}
-                className="w-12 h-12 object-contain"
+                className="w-10 h-10 object-contain"
               />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
-                {product.name}
-              </h3>
-              <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
-                <Building2 className="w-3 h-3" />
-                <span className="truncate">{product.targetAudience}</span>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">
+                  {product.name}
+                </h3>
+                {product.usesAI && (
+                  <Badge variant="default" className="gap-1 text-xs rounded-full px-2 py-0">
+                    <Sparkles className="w-3 h-3" />
+                    AI
+                  </Badge>
+                )}
               </div>
+              <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                {product.description}
+              </p>
             </div>
           </div>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {product.description}
-          </p>
           
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">{product.category}</Badge>
-            {product.tags.slice(0, 2).map((tag) => (
-              <Badge key={tag} variant="outline" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
+          {/* Category */}
+          <div>
+            <Badge variant="secondary" className="rounded-full">{product.category}</Badge>
           </div>
           
-          <div className="flex items-center gap-2 text-sm">
-            <Users className="w-4 h-4 text-muted-foreground" />
+          {/* Traction */}
+          <div className="pt-2 border-t border-border/50">
             <TractionBadge traction={product.traction} />
           </div>
           
+          {/* Partnership Badges */}
           <PartnershipBadges partnerships={product.partnerships} />
         </CardContent>
       </Card>

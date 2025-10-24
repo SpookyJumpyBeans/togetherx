@@ -1,4 +1,25 @@
-import { Product } from "@/components/ProductCard";
+export interface Product {
+  id: string;
+  name: string;
+  logo: string;
+  description: string;
+  targetAudience: string;
+  category: string;
+  tags: string[];
+  usesAI: boolean;
+  techHighlights: string[];
+  traction: {
+    users?: number;
+    mau?: number;
+    revenue?: string;
+  };
+  partnerships: {
+    coMarketing: boolean;
+    whiteLabel: boolean;
+    acquisition: boolean;
+    reseller: boolean;
+  };
+}
 
 export const mockProducts: Product[] = [
   {
@@ -9,6 +30,8 @@ export const mockProducts: Product[] = [
     targetAudience: "B2B SaaS",
     category: "DevTools",
     tags: ["AI", "Development", "Code Review"],
+    usesAI: true,
+    techHighlights: ["GPT-4 Integration", "Static Analysis", "Real-time Collaboration"],
     traction: {
       users: 15000,
       mau: 8500,
@@ -29,6 +52,8 @@ export const mockProducts: Product[] = [
     targetAudience: "B2B Enterprise",
     category: "MarTech",
     tags: ["Analytics", "E-commerce", "Market Research"],
+    usesAI: true,
+    techHighlights: ["Machine Learning", "Real-time Data Pipeline", "REST API"],
     traction: {
       users: 2500,
       mau: 1800,
@@ -49,6 +74,8 @@ export const mockProducts: Product[] = [
     targetAudience: "SMB",
     category: "LegalTech",
     tags: ["Legal", "Automation", "Documents"],
+    usesAI: true,
+    techHighlights: ["Document AI", "OCR Technology", "Smart Contracts"],
     traction: {
       users: 5000,
       mau: 3200,
@@ -69,6 +96,8 @@ export const mockProducts: Product[] = [
     targetAudience: "B2B Healthcare",
     category: "HealthTech",
     tags: ["Healthcare", "Patient Care", "Communication"],
+    usesAI: true,
+    techHighlights: ["Computer Vision", "Predictive Analytics", "HIPAA Compliant"],
     traction: {
       users: 50000,
       mau: 28000,
@@ -89,6 +118,8 @@ export const mockProducts: Product[] = [
     targetAudience: "B2C Education",
     category: "EdTech",
     tags: ["Education", "Streaming", "Online Learning"],
+    usesAI: true,
+    techHighlights: ["AI Content Recommendations", "WebRTC", "Cloud Infrastructure"],
     traction: {
       users: 125000,
       mau: 45000,
@@ -109,6 +140,8 @@ export const mockProducts: Product[] = [
     targetAudience: "B2C FinTech",
     category: "FinTech",
     tags: ["Finance", "Banking", "Personal Finance"],
+    usesAI: false,
+    techHighlights: ["Blockchain", "Plaid API", "Multi-currency Support"],
     traction: {
       users: 32000,
       mau: 21000,
