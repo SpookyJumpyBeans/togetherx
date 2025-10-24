@@ -7,8 +7,7 @@ import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { ContactDialog } from "@/components/ContactDialog";
-import { TractionLeaderboard } from "@/components/TractionLeaderboard";
-import { Rocket, Search } from "lucide-react";
+import { Rocket } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
@@ -105,45 +104,41 @@ const Index = () => {
       />
       
       {/* Hero Section */}
-      <section className="container mx-auto px-6 md:px-8 pt-20 md:pt-28 pb-16 md:pb-20">
-        <div className="max-w-5xl mx-auto text-center space-y-8">
+      <section className="container mx-auto px-6 md:px-8 pt-20 md:pt-28 pb-12 md:pb-16">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-            Where founders{" "}
-            <span className="bg-gradient-primary bg-clip-text text-transparent">
-              scale together
-            </span>
+            Discover partnership opportunities
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Discover partnership opportunities — co-marketing, white-label, acquisitions, and more.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            Co-marketing, white-label, acquisitions, and more. Connect with founders who want to scale together.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Button 
               size="lg" 
-              className="gap-2 rounded-full shadow-lg hover:shadow-xl transition-all px-8 h-12 text-base"
+              className="rounded-full bg-foreground text-background hover:bg-foreground/90 px-8 h-12"
               onClick={() => setSubmitDialogOpen(true)}
             >
-              <Rocket className="w-5 h-5" />
-              Submit Your Product
+              Submit your product
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="lg"
-              className="gap-2 rounded-full px-8 h-12 text-base"
-              onClick={() => window.location.href = "#leaderboard"}
+              className="rounded-full px-8 h-12"
+              onClick={() => window.location.href = "/leaderboard"}
             >
-              View Leaderboard
+              View leaderboard
             </Button>
           </div>
         </div>
       </section>
 
       {/* Filters Section */}
-      <section className="container mx-auto px-6 md:px-8 py-12">
-        <div className="max-w-7xl mx-auto space-y-6">
+      <section className="container mx-auto px-6 md:px-8 pb-8">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
-            <div className="flex gap-4 flex-wrap lg:flex-nowrap flex-1">
+            <div className="flex gap-3 flex-wrap lg:flex-nowrap">
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-full lg:w-[200px] h-12 rounded-full border-0 border-b-2 border-border/50 bg-transparent hover:border-primary/50 transition-colors focus:border-primary shadow-none px-4">
+                <SelectTrigger className="w-full lg:w-[160px] h-10 rounded-full bg-muted border-0 hover:bg-muted/80">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -155,7 +150,7 @@ const Index = () => {
               </Select>
 
               <Select value={audienceFilter} onValueChange={setAudienceFilter}>
-                <SelectTrigger className="w-full lg:w-[200px] h-12 rounded-full border-0 border-b-2 border-border/50 bg-transparent hover:border-primary/50 transition-colors focus:border-primary shadow-none px-4">
+                <SelectTrigger className="w-full lg:w-[160px] h-10 rounded-full bg-muted border-0 hover:bg-muted/80">
                   <SelectValue placeholder="Audience" />
                 </SelectTrigger>
                 <SelectContent>
@@ -167,7 +162,7 @@ const Index = () => {
               </Select>
 
               <Select value={userFilter} onValueChange={setUserFilter}>
-                <SelectTrigger className="w-full lg:w-[200px] h-12 rounded-full border-0 border-b-2 border-border/50 bg-transparent hover:border-primary/50 transition-colors focus:border-primary shadow-none px-4">
+                <SelectTrigger className="w-full lg:w-[160px] h-10 rounded-full bg-muted border-0 hover:bg-muted/80">
                   <SelectValue placeholder="Users" />
                 </SelectTrigger>
                 <SelectContent>
@@ -178,9 +173,10 @@ const Index = () => {
                   <SelectItem value="50k+">50k+ users</SelectItem>
                 </SelectContent>
               </Select>
+
               <Select value={dateFilter} onValueChange={setDateFilter}>
-                <SelectTrigger className="w-full lg:w-[200px] h-12 rounded-full border-0 border-b-2 border-border/50 bg-transparent hover:border-primary/50 transition-colors focus:border-primary shadow-none px-4">
-                  <SelectValue placeholder="Submission Date" />
+                <SelectTrigger className="w-full lg:w-[160px] h-10 rounded-full bg-muted border-0 hover:bg-muted/80">
+                  <SelectValue placeholder="Date" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Time</SelectItem>
@@ -191,37 +187,21 @@ const Index = () => {
               </Select>
             </div>
 
-            <div className="relative w-full lg:w-80">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 rounded-full border-0 border-b-2 border-border/50 bg-transparent hover:border-primary/50 transition-colors focus:border-primary shadow-none"
-              />
-            </div>
+            <Input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full lg:w-80 h-10 rounded-full bg-muted border-0 px-4 placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring"
+            />
           </div>
         </div>
       </section>
 
-      {/* Traction Leaderboard Section */}
-      <section id="leaderboard" className="container mx-auto px-6 md:px-8 py-16 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Traction Leaderboard</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Fastest-growing products in the community
-            </p>
-          </div>
-          <TractionLeaderboard />
-        </div>
-      </section>
-
-      {/* Products Grid */}
-      <section id="products" className="container mx-auto px-6 md:px-8 pb-16 flex-1">
+      {/* Products Grid - Pinterest Style */}
+      <section id="products" className="container mx-auto px-6 md:px-8 pb-20 flex-1">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
             {displayedProducts.map((product) => (
               <ProductCardWithPin
                 key={product.id}
@@ -250,7 +230,7 @@ const Index = () => {
       <EnhancedSubmitDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen} />
       <SubscribeDialog open={subscribeDialogOpen} onOpenChange={setSubscribeDialogOpen} />
       <ContactDialog open={contactDialogOpen} onOpenChange={setContactDialogOpen} />
-      <ProductDetailDialog
+      <ProductDetailDialog 
         product={selectedProduct} 
         open={detailDialogOpen} 
         onOpenChange={setDetailDialogOpen} 

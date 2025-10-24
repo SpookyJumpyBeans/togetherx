@@ -58,9 +58,12 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
             </span>
           </div>
 
-          <nav className="flex items-center gap-4">
-            <a href="#products" className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <nav className="flex items-center gap-6">
+            <a href="/" className="hidden md:block text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
               Products
+            </a>
+            <a href="/leaderboard" className="hidden md:block text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+              Leaderboard
             </a>
 
             <Button 
@@ -76,11 +79,11 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
             <Button 
               variant="default" 
               size="sm" 
-              className="rounded-full"
+              className="rounded-full bg-foreground text-background hover:bg-foreground/90"
               onClick={handleSubmitClick}
             >
               <Rocket className="w-4 h-4 md:mr-2" />
-              <span className="hidden md:inline">Submit Product</span>
+              <span className="hidden md:inline">Submit</span>
             </Button>
 
             {user ? (
@@ -88,7 +91,7 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="rounded-full h-9 w-9 p-0">
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-gradient-primary text-primary-foreground text-xs">
+                      <AvatarFallback className="bg-muted text-foreground text-xs">
                         {user.email?.[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>

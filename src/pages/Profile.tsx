@@ -187,73 +187,11 @@ export default function Profile() {
               />
             </div>
 
-            {/* Social Links */}
-            <div className="pt-6 border-t border-border/30">
-              <h3 className="text-lg font-semibold mb-6">Social Links</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <Label htmlFor="linkedin" className="text-sm font-medium mb-2 block flex items-center gap-2">
-                    <Linkedin className="w-4 h-4 text-primary" />
-                    LinkedIn
-                  </Label>
-                  <Input
-                    id="linkedin"
-                    value={profile.linkedin}
-                    onChange={(e) => setProfile({ ...profile, linkedin: e.target.value })}
-                    placeholder="https://linkedin.com/in/yourprofile"
-                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="twitter" className="text-sm font-medium mb-2 block flex items-center gap-2">
-                    <Twitter className="w-4 h-4 text-primary" />
-                    Twitter/X
-                  </Label>
-                  <Input
-                    id="twitter"
-                    value={profile.twitter}
-                    onChange={(e) => setProfile({ ...profile, twitter: e.target.value })}
-                    placeholder="https://twitter.com/yourhandle"
-                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="website" className="text-sm font-medium mb-2 block flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-primary" />
-                    Website
-                  </Label>
-                  <Input
-                    id="website"
-                    value={profile.website}
-                    onChange={(e) => setProfile({ ...profile, website: e.target.value })}
-                    placeholder="https://yourwebsite.com"
-                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="github" className="text-sm font-medium mb-2 block flex items-center gap-2">
-                    <Github className="w-4 h-4 text-primary" />
-                    GitHub
-                  </Label>
-                  <Input
-                    id="github"
-                    value={profile.github}
-                    onChange={(e) => setProfile({ ...profile, github: e.target.value })}
-                    placeholder="https://github.com/yourusername"
-                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
-                  />
-                </div>
-              </div>
-            </div>
-
             <div className="flex gap-4">
               <Button
                 onClick={handleSaveProfile}
                 disabled={saving}
-                className="rounded-full px-8"
+                className="rounded-full px-8 bg-foreground text-background hover:bg-foreground/90"
                 size="lg"
               >
                 <Save className="w-4 h-4 mr-2" />
@@ -276,27 +214,27 @@ export default function Profile() {
         {/* Pin Board Section */}
         <section>
           <div className="flex items-center gap-3 mb-8">
-            <Pin className="w-6 h-6 text-primary" />
-            <h2 className="text-3xl font-bold">My Pin Board</h2>
+            <Pin className="w-6 h-6" />
+            <h2 className="text-3xl font-bold">Saved Products</h2>
           </div>
 
           {pinnedProducts.length === 0 ? (
             <div className="text-center py-20 border-2 border-dashed border-border/30 rounded-3xl">
               <Pin className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground text-lg">No pinned products yet</p>
+              <p className="text-muted-foreground text-lg">No saved products yet</p>
               <p className="text-sm text-muted-foreground mt-2">
-                Start pinning products from the main page
+                Save products to your board from the main page
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
               {pinnedProducts.map((product) => (
-                <div key={product.id} className="relative">
+                <div key={product.id} className="relative break-inside-avoid mb-6">
                   <ProductCard product={product} />
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="absolute top-4 right-4 rounded-full"
+                    className="absolute top-3 right-3 rounded-full z-10 h-8 w-8 p-0"
                     onClick={() => handleUnpin(product.id)}
                   >
                     Unpin
