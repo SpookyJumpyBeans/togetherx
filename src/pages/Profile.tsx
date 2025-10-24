@@ -37,16 +37,22 @@ export default function Profile() {
   }, []);
 
   const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      navigate("/auth");
-      return;
+    try {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
+      setUser(session.user);
+      await loadProfile(session.user.id);
+      await loadPinnedProducts(session.user.id);
+    } catch (err) {
+      console.error("Profile init error:", err);
+      toast.error("Unable to load your profile");
+    } finally {
+      setLoading(false);
     }
-
-    setUser(session.user);
-    await loadProfile(session.user.id);
-    await loadPinnedProducts(session.user.id);
   };
 
   const loadProfile = async (userId: string) => {
@@ -76,43 +82,52 @@ export default function Profile() {
   };
 
   const loadPinnedProducts = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("pinned_products")
-      .select(`
-        product_id,
-        products (*)
-      `)
-      .eq("user_id", userId);
-
-    if (data) {
-      setPinnedProducts(data.map((item: any) => item.products));
+    try {
+      const { data, error } = await supabase
+        .from("pinned_products")
+        .select(`
+          product_id,
+          products (*)
+        `)
+        .eq("user_id", userId);
+      if (error) {
+        throw error;
+      }
+      setPinnedProducts((data ?? []).map((item: any) => item.products).filter(Boolean));
+    } catch (err) {
+      console.error("Pinned products load error:", err);
     }
   };
 
   const handleSaveProfile = async () => {
     if (!user) return;
-
     setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        name: profile.name,
-        role: profile.role,
-        email: profile.email,
-        linkedin: profile.linkedin,
-        twitter: profile.twitter,
-        website: profile.website,
-        github: profile.github,
-      })
-      .eq("id", user.id);
-
-    if (error) {
-      console.error("Profile save error:", error);
-      toast.error(`Failed to save profile: ${error.message}`);
-    } else {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: user.id,
+            name: profile.name,
+            role: profile.role,
+            email: profile.email,
+            linkedin: profile.linkedin,
+            twitter: profile.twitter,
+            website: profile.website,
+            github: profile.github,
+          },
+          { onConflict: "id" }
+        );
+      if (error) {
+        throw error;
+      }
       toast.success("Profile saved successfully");
+    } catch (error: any) {
+      console.error("Profile save error:", error);
+      toast.error(`Failed to save profile: ${error.message ?? "Unknown error"}`);
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const handleUnpin = async (productId: string) => {
