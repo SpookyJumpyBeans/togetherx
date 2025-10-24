@@ -30,14 +30,14 @@ export const ProductCardWithPin = ({ product, onClick }: ProductCardWithPinProps
   };
 
   const checkIfPinned = async (userId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("pinned_products")
       .select("id")
       .eq("user_id", userId)
       .eq("product_id", product.id)
-      .single();
+      .maybeSingle();
 
-    setIsPinned(!!data);
+    setIsPinned(!!data && !error);
   };
 
   const handlePin = async (e: React.MouseEvent) => {

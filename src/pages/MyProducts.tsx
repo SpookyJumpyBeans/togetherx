@@ -82,8 +82,8 @@ export default function MyProducts() {
       .eq("id", productId);
 
     if (error) {
-      toast.error("Failed to update product");
-      console.error(error);
+      console.error('Update product error', error);
+      toast.error(`Failed to update product: ${error.message || 'Unknown error'}`);
     } else {
       toast.success("Product updated! It will be re-reviewed before going live.");
       setEditingId(null);
