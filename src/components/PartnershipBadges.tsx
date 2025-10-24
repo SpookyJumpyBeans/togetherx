@@ -24,7 +24,7 @@ export const PartnershipBadges = ({ partnerships }: PartnershipBadgesProps) => {
 
   if (partnerships.whiteLabel) {
     badges.push(
-      <Badge key="whitelabel" variant="warning" className="gap-1 text-xs">
+      <Badge key="whitelabel" variant="whitelabel" className="gap-1 text-xs">
         <Package className="w-3 h-3" />
         White Label
       </Badge>
@@ -33,7 +33,7 @@ export const PartnershipBadges = ({ partnerships }: PartnershipBadgesProps) => {
 
   if (partnerships.acquisition) {
     badges.push(
-      <Badge key="acquisition" variant="warning" className="gap-1 text-xs">
+      <Badge key="acquisition" variant="acquisition" className="gap-1 text-xs">
         <DollarSign className="w-3 h-3" />
         Open to Offers
       </Badge>
@@ -42,7 +42,7 @@ export const PartnershipBadges = ({ partnerships }: PartnershipBadgesProps) => {
 
   if (partnerships.reseller) {
     badges.push(
-      <Badge key="reseller" variant="warning" className="gap-1 text-xs">
+      <Badge key="reseller" variant="reseller" className="gap-1 text-xs">
         <Store className="w-3 h-3" />
         Reseller
       </Badge>

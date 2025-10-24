@@ -14,6 +14,9 @@ const badgeVariants = cva(
         outline: "text-foreground",
         success: "border-transparent bg-success/10 text-success border-success/20",
         warning: "border-transparent bg-warning/10 text-warning border-warning/20",
+        reseller: "border-transparent bg-reseller/10 text-reseller border-reseller/20",
+        whitelabel: "border-transparent bg-whitelabel/10 text-whitelabel border-whitelabel/20",
+        acquisition: "border-transparent bg-acquisition/10 text-acquisition border-acquisition/20",
       },
     },
     defaultVariants: {

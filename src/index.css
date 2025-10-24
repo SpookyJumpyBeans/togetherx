@@ -36,6 +36,15 @@ All colors MUST be HSL.
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
+    --reseller: 160 85% 45%;
+    --reseller-foreground: 0 0% 100%;
+    
+    --whitelabel: 280 65% 60%;
+    --whitelabel-foreground: 0 0% 100%;
+    
+    --acquisition: 0 84% 60%;
+    --acquisition-foreground: 0 0% 100%;
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
@@ -94,6 +103,15 @@ All colors MUST be HSL.
 
     --warning: 38 92% 55%;
     --warning-foreground: 0 0% 100%;
+
+    --reseller: 160 85% 50%;
+    --reseller-foreground: 0 0% 100%;
+    
+    --whitelabel: 280 65% 65%;
+    --whitelabel-foreground: 0 0% 100%;
+    
+    --acquisition: 0 62% 50%;
+    --acquisition-foreground: 0 0% 98%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;

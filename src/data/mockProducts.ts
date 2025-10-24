@@ -2,6 +2,7 @@ export interface Product {
   id: string;
   name: string;
   logo: string;
+  image?: string;
   description: string;
   targetAudience: string;
   category: string;
@@ -26,6 +27,7 @@ export const mockProducts: Product[] = [
     id: "1",
     name: "CodeFlow AI",
     logo: "https://api.dicebear.com/7.x/shapes/svg?seed=codeflow",
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop",
     description: "AI-powered code review and optimization platform for development teams",
     targetAudience: "B2B SaaS",
     category: "DevTools",
@@ -48,6 +50,7 @@ export const mockProducts: Product[] = [
     id: "2",
     name: "MarketPulse",
     logo: "https://api.dicebear.com/7.x/shapes/svg?seed=marketpulse",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop",
     description: "Real-time market intelligence and competitor tracking for e-commerce brands",
     targetAudience: "B2B Enterprise",
     category: "MarTech",
@@ -70,6 +73,7 @@ export const mockProducts: Product[] = [
     id: "3",
     name: "LegalDocs Pro",
     logo: "https://api.dicebear.com/7.x/shapes/svg?seed=legaldocs",
+    image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&h=400&fit=crop",
     description: "Automated legal document generation and contract management for SMBs",
     targetAudience: "SMB",
     category: "LegalTech",
@@ -92,6 +96,7 @@ export const mockProducts: Product[] = [
     id: "4",
     name: "HealthTrack Connect",
     logo: "https://api.dicebear.com/7.x/shapes/svg?seed=healthtrack",
+    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop",
     description: "Patient engagement platform connecting healthcare providers with patients",
     targetAudience: "B2B Healthcare",
     category: "HealthTech",
@@ -114,6 +119,7 @@ export const mockProducts: Product[] = [
     id: "5",
     name: "EduStream",
     logo: "https://api.dicebear.com/7.x/shapes/svg?seed=edustream",
+    image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&h=400&fit=crop",
     description: "Interactive live streaming platform for online education and courses",
     targetAudience: "B2C Education",
     category: "EdTech",
@@ -136,6 +142,7 @@ export const mockProducts: Product[] = [
     id: "6",
     name: "FinSync",
     logo: "https://api.dicebear.com/7.x/shapes/svg?seed=finsync",
+    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&h=400&fit=crop",
     description: "Multi-bank account aggregation and financial planning for freelancers",
     targetAudience: "B2C FinTech",
     category: "FinTech",

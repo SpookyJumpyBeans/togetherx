@@ -48,6 +48,18 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        reseller: {
+          DEFAULT: "hsl(var(--reseller))",
+          foreground: "hsl(var(--reseller-foreground))",
+        },
+        whitelabel: {
+          DEFAULT: "hsl(var(--whitelabel))",
+          foreground: "hsl(var(--whitelabel-foreground))",
+        },
+        acquisition: {
+          DEFAULT: "hsl(var(--acquisition))",
+          foreground: "hsl(var(--acquisition-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",

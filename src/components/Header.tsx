@@ -1,15 +1,47 @@
 import { Button } from "@/components/ui/button";
-import { Handshake, Rocket } from "lucide-react";
+import { Handshake, Rocket, LogIn, LogOut, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { User as SupabaseUser } from "@supabase/supabase-js";
+import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
   onSubmitClick?: () => void;
 }
 
 export const Header = ({ onSubmitClick }: HeaderProps) => {
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const handleSubmitClick = () => {
     if (onSubmitClick) {
       onSubmitClick();
     }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
   };
 
   return (
@@ -25,31 +57,51 @@ export const Header = ({ onSubmitClick }: HeaderProps) => {
             </span>
           </div>
 
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#products" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <nav className="flex items-center gap-4">
+            <a href="#products" className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Products
             </a>
+            
             <Button 
               variant="default" 
               size="sm" 
               className="rounded-full"
               onClick={handleSubmitClick}
             >
-              <Rocket className="w-4 h-4 mr-2" />
-              Submit Product
+              <Rocket className="w-4 h-4 md:mr-2" />
+              <span className="hidden md:inline">Submit Product</span>
             </Button>
-          </nav>
 
-          <div className="md:hidden">
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="rounded-full"
-              onClick={handleSubmitClick}
-            >
-              <Rocket className="w-4 h-4" />
-            </Button>
-          </div>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="rounded-full h-9 w-9 p-0">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-gradient-primary text-primary-foreground text-xs">
+                        {user.email?.[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate("/auth")}
+                className="rounded-full"
+              >
+                <LogIn className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:inline">Login</span>
+              </Button>
+            )}
+          </nav>
         </div>
       </div>
     </header>

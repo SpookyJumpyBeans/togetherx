@@ -86,19 +86,8 @@ const Index = () => {
       <section className="container mx-auto px-4 md:px-6 py-6 md:py-8">
         <div className="max-w-6xl mx-auto space-y-4">
           {/* Search and Filters Row */}
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 h-11 rounded-full border-border/50 bg-background/50 backdrop-blur-sm"
-              />
-            </div>
-            
-            <div className="flex gap-3 flex-wrap md:flex-nowrap">
+          <div className="flex flex-col md:flex-row gap-3 items-center">
+            <div className="flex gap-3 flex-wrap md:flex-nowrap w-full md:w-auto">
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-full md:w-[180px] rounded-full border-border/50 bg-background/50 backdrop-blur-sm">
                   <SlidersHorizontal className="w-4 h-4 mr-2" />
@@ -136,6 +125,17 @@ const Index = () => {
                   <SelectItem value="50k+">50k+ users</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-11 h-11 rounded-full border-border/50 bg-background/50 backdrop-blur-sm"
+              />
             </div>
           </div>
         </div>

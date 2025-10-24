@@ -8,6 +8,7 @@ export interface Product {
   id: string;
   name: string;
   logo: string;
+  image?: string;
   description: string;
   targetAudience: string;
   category: string;
@@ -34,9 +35,21 @@ interface ProductCardProps {
 export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Card className="h-full hover:shadow-xl transition-all duration-300 group border border-border/50 hover:border-primary/30 bg-card/50 backdrop-blur-sm overflow-hidden cursor-pointer">
-      <CardContent className="p-6 space-y-4">
-        {/* Logo & Name */}
-        <div className="flex items-start gap-4">
+      <CardContent className="p-0">
+        {/* Product Image */}
+        {product.image && (
+          <div className="w-full h-40 overflow-hidden">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        )}
+        
+        <div className="p-6 space-y-4">
+          {/* Logo & Name */}
+          <div className="flex items-start gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
             <img
               src={product.logo}
@@ -72,8 +85,9 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           <TractionBadge traction={product.traction} />
         </div>
         
-        {/* Partnership Badges */}
-        <PartnershipBadges partnerships={product.partnerships} />
+          {/* Partnership Badges */}
+          <PartnershipBadges partnerships={product.partnerships} />
+        </div>
       </CardContent>
     </Card>
   );
