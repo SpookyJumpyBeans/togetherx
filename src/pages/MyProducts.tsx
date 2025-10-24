@@ -62,13 +62,7 @@ export default function MyProducts() {
   };
 
   const handleEdit = (product: any) => {
-    setEditingId(product.id);
-    setEditForm({
-      name: product.name,
-      website_link: product.website_link,
-      description: product.description,
-      contact_email: product.contact_email,
-    });
+    navigate(`/products/${product.id}/edit`);
   };
 
   const handleSave = async (productId: string) => {
@@ -76,8 +70,7 @@ export default function MyProducts() {
       .from("products")
       .update({
         ...editForm,
-        approval_status: 'pending', // Reset to pending when edited
-        updated_at: new Date().toISOString(),
+        approval_status: 'pending',
       })
       .eq("id", productId);
 

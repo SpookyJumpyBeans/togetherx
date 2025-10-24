@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Product } from "@/components/ProductCard";
+import { supabase } from "@/lib/supabase";
+import { DbProductCardWithPin } from "@/components/DbProductCardWithPin";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,6 +27,7 @@ const Index = () => {
   const [contactDialogOpen, setContactDialogOpen] = useState(false);
   const [dateFilter, setDateFilter] = useState<string>("all");
   const [displayCount, setDisplayCount] = useState(12);
+  const [approvedProducts, setApprovedProducts] = useState<any[]>([]);
   const observerTarget = useRef(null);
 
   // Listen for custom event to reopen submit dialog after auth
@@ -41,6 +44,20 @@ const Index = () => {
     };
     window.addEventListener('openSubmitDialog', handleOpenSubmit);
     return () => window.removeEventListener('openSubmitDialog', handleOpenSubmit);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('id,name,description,website_link')
+        .eq('approval_status','approved')
+        .order('created_at', { ascending: false })
+        .limit(8);
+      if (!error && mounted) setApprovedProducts(data || []);
+    })();
+    return () => { mounted = false; };
   }, []);
 
   const categories = useMemo(() => Array.from(new Set(mockProducts.map((p) => p.category))), []);
@@ -203,7 +220,24 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Products Grid */}
+      {/* Approved Products (live) */}
+      {approvedProducts.length > 0 && (
+        <section id="approved-products" className="container mx-auto px-6 md:px-8 pb-12">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-2xl font-semibold mb-4">Approved Products</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {approvedProducts.map((p) => (
+                <DbProductCardWithPin
+                  key={p.id}
+                  product={{ id: p.id, name: p.name, description: p.description, website_link: p.website_link }}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Products Grid (demo/mock) */}
       <section id="products" className="container mx-auto px-6 md:px-8 pb-20 flex-1">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
