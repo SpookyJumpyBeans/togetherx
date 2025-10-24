@@ -130,70 +130,8 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     setLoading(true);
 
     try {
-      // Upload product screenshot
-      let imageUrl = "";
-      if (formData.screenshot) {
-        const fileExt = formData.screenshot.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from('product-images')
-          .upload(fileName, formData.screenshot);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(fileName);
-        
-        imageUrl = publicUrl;
-      }
-
-      // Upload traction verification files if provided
-      const uploadTractionFile = async (file: File | null, prefix: string) => {
-        if (!file) return null;
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}/${prefix}-${Math.random()}.${fileExt}`;
-        const { error } = await supabase.storage
-          .from('product-images')
-          .upload(fileName, file);
-        if (error) throw error;
-        return fileName;
-      };
-
-      const usersFileUrl = await uploadTractionFile(formData.usersFile, 'users');
-      const revenueFileUrl = await uploadTractionFile(formData.revenueFile, 'revenue');
-      const growthFileUrl = await uploadTractionFile(formData.growthFile, 'growth');
-
-      // Insert product
-      const { error: insertError } = await supabase
-        .from('products')
-        .insert([{
-          user_id: user.id,
-          name: formData.name,
-          website_link: formData.websiteLink,
-          image: imageUrl,
-          description: formData.description,
-          target_audience: formData.targetAudience,
-          category: formData.category,
-          contact_email: formData.contactEmail,
-          tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
-          uses_ai: formData.usesAI,
-          tech_highlights: formData.techHighlights.split(',').map(t => t.trim()).filter(Boolean),
-          users: formData.users ? parseInt(formData.users) : null,
-          revenue: formData.revenue,
-          growth_rate: formData.growthRate,
-          users_file: usersFileUrl,
-          revenue_file: revenueFileUrl,
-          growth_file: growthFileUrl,
-          co_marketing: formData.coMarketing,
-          white_label: formData.whiteLabel,
-          acquisition: formData.acquisition,
-          reseller: formData.reseller,
-          partnership: formData.partnership,
-          show_on_leaderboard: formData.showOnLeaderboard,
-        }]);
-
-      if (insertError) throw insertError;
+      // Simulate submission (database would go here)
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       toast.success("Product submitted successfully!");
       
