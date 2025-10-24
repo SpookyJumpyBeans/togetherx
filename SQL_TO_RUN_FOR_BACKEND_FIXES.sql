@@ -6,10 +6,12 @@ create table if not exists public.product_contacts (
   id uuid primary key default gen_random_uuid(),
   product_id uuid references public.products(id) on delete cascade not null,
   user_id uuid references auth.users(id) on delete cascade not null,
-  contacted_at timestamp with time zone default now() not null,
-  -- Unique constraint: one contact per user per product per month
-  unique (product_id, user_id, date_trunc('month', contacted_at))
+  contacted_at timestamp with time zone default now() not null
 );
+
+-- Create unique index to enforce one contact per user per product per month
+create unique index if not exists idx_product_contacts_unique_monthly
+  on public.product_contacts (product_id, user_id, date_trunc('month', contacted_at));
 
 -- Enable RLS
 alter table public.product_contacts enable row level security;
