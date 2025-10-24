@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ProductCard } from "@/components/ProductCard";
 import { SuccessStoryDialog } from "@/components/SuccessStoryDialog";
+import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
+import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { User, Save, Pin, Trophy, Linkedin, Github, Globe, Twitter } from "lucide-react";
@@ -26,6 +28,8 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [storyDialogOpen, setStoryDialogOpen] = useState(false);
+  const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -131,7 +135,10 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header />
+      <Header 
+        onSubmitClick={() => setSubmitDialogOpen(true)}
+        onSubscribeClick={() => setSubscribeDialogOpen(true)}
+      />
 
       <main className="container mx-auto px-6 md:px-8 py-16 flex-1 max-w-7xl">
         {/* Profile Section */}
@@ -249,6 +256,8 @@ export default function Profile() {
       <Footer />
 
       <SuccessStoryDialog open={storyDialogOpen} onOpenChange={setStoryDialogOpen} />
+      <EnhancedSubmitDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen} />
+      <SubscribeDialog open={subscribeDialogOpen} onOpenChange={setSubscribeDialogOpen} />
     </div>
   );
 }
