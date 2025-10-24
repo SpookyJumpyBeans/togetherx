@@ -1,24 +1,41 @@
 -- Run these in your database if not already applied
 
 -- 1) Product Contacts Table - Track founder contact clicks for leaderboard
--- Use a generated month key column (immutable) for unique constraint
--- This avoids non-immutable functions in index expressions
+-- Use a trigger-populated month key (YYYYMM) for uniqueness
 
 create table if not exists public.product_contacts (
   id uuid primary key default gen_random_uuid(),
   product_id uuid references public.products(id) on delete cascade not null,
   user_id uuid references auth.users(id) on delete cascade not null,
-  contacted_at timestamp with time zone default now() not null,
-  -- YearMonth integer like 202510 (YYYYMM)
-  contact_month int generated always as (
-    (extract(year from contacted_at)::int * 100) + extract(month from contacted_at)::int
-  ) stored
+  contacted_at timestamptz default now() not null,
+  contact_month int -- YYYYMM, populated by trigger
 );
 
--- Create unique index to enforce one contact per user per product per month
+-- Trigger to populate contact_month
+create or replace function public.set_contact_month()
+returns trigger
+language plpgsql
+as $$
+begin
+  NEW.contact_month := (extract(year from NEW.contacted_at at time zone 'UTC')::int * 100)
+                        + extract(month from NEW.contacted_at at time zone 'UTC')::int;
+  return NEW;
+end;
+$$;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_trigger where tgname = 'trg_product_contacts_set_month'
+  ) then
+    create trigger trg_product_contacts_set_month
+      before insert or update on public.product_contacts
+      for each row execute procedure public.set_contact_month();
+  end if;
+end $$;
+
+-- Enforce one contact per user per product per month
 create unique index if not exists idx_product_contacts_unique_monthly
   on public.product_contacts (product_id, user_id, contact_month);
-
 
 -- Enable RLS
 alter table public.product_contacts enable row level security;
@@ -41,7 +58,7 @@ end $$;
 
 -- Index for faster leaderboard queries
 create index if not exists idx_product_contacts_month 
-  on public.product_contacts (product_id, date_trunc('month', contacted_at));
+  on public.product_contacts (product_id, contact_month);
 
 create index if not exists idx_product_contacts_product 
   on public.product_contacts (product_id, contacted_at desc);
