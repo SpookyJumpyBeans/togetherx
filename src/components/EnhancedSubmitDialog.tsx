@@ -174,20 +174,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
           name: formData.name,
           website_link: formData.websiteLink,
           description: formData.description,
-          target_audience: formData.targetAudience || null,
-          category: formData.category || null,
           contact_email: formData.contactEmail,
-          tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
-          uses_ai: formData.usesAI,
-          tech_highlights: formData.techHighlights ? formData.techHighlights.split(',').map(t => t.trim()).filter(Boolean) : [],
-          users: formData.users ? parseInt(formData.users) : null,
-          revenue: formData.revenue || null,
-          growth_rate: formData.growthRate || null,
-          co_marketing: formData.coMarketing,
-          white_label: formData.whiteLabel,
-          acquisition: formData.acquisition,
-          reseller: formData.reseller,
-          show_on_leaderboard: formData.showOnLeaderboard,
         }]);
 
       if (insertError) throw insertError;
