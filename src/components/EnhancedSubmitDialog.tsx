@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,6 +46,13 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     acquisition: false,
   });
   const [loading, setLoading] = useState(false);
+
+  // Validation schema
+  const formSchema = z.object({
+    name: z.string().trim().min(1, "Product name is required"),
+    description: z.string().trim().min(1, "Description is required"),
+    contactEmail: z.string().trim().email("Valid contact email required"),
+  });
 
   useEffect(() => {
     checkUser();
@@ -127,6 +135,21 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
       return;
     }
     
+    // Validate required fields
+    const result = formSchema.safeParse({
+      name: formData.name,
+      description: formData.description,
+      contactEmail: formData.contactEmail,
+    });
+    if (!result.success) {
+      toast.error(result.error.issues[0]?.message ?? "Please fill in the required fields.");
+      return;
+    }
+    if (!formData.screenshot) {
+      toast.error("Please add a product screenshot.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -213,7 +236,6 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="TaskFlow AI"
               className="h-12 bg-muted/30 border-0"
-              required
             />
           </div>
 
@@ -244,7 +266,6 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
                 onChange={handleScreenshotChange}
                 className="hidden"
                 id="screenshot-upload"
-                required={!formData.screenshot}
               />
               <label
                 htmlFor="screenshot-upload"
@@ -280,7 +301,6 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
               placeholder="What does your product do? Who does it serve?"
               rows={4}
               className="bg-muted/30 border-0 resize-none"
-              required
             />
           </div>
 
@@ -513,7 +533,6 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
               onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
               placeholder="founder@company.com"
               className="h-12 bg-muted/30 border-0"
-              required
             />
             <p className="text-sm text-muted-foreground">
               Your email remains private. Other founders will not see it directly — messages are forwarded securely to your inbox.
