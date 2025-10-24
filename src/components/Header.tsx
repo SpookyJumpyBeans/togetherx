@@ -118,7 +118,7 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
                   <Button variant="ghost" size="sm" className="rounded-full h-9 w-9 p-0">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-muted text-foreground text-xs">
-                        {user.email?.[0].toUpperCase()}
+                        { (user.email ?? "").charAt(0).toUpperCase() || ((user.user_metadata?.name ?? "").charAt(0).toUpperCase()) || "U" }
                       </AvatarFallback>
                     </Avatar>
                   </Button>
