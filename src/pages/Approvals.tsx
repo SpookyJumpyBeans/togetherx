@@ -3,10 +3,10 @@ import { supabase } from "@/lib/supabase";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ProductCard } from "@/components/ProductCard";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { CheckCircle, XCircle, Clock, AlertCircle, ExternalLink } from "lucide-react";
 import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import {
@@ -154,25 +154,45 @@ export default function Approvals() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {pendingProducts.map((product) => (
-                  <div key={product.id} className="relative">
-                    <ProductCard product={product} />
-                    <div className="flex gap-2 mt-4">
-                      <Button
-                        onClick={() => handleApprove(product.id)}
-                        className="flex-1 bg-success hover:bg-success/90"
-                      >
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Approve
-                      </Button>
-                      <Button
-                        onClick={() => handleReject(product.id)}
-                        variant="destructive"
-                        className="flex-1"
-                      >
-                        <XCircle className="w-4 h-4 mr-2" />
-                        Reject
-                      </Button>
-                    </div>
+                  <div key={product.id}>
+                    <Card className="overflow-hidden">
+                      <CardHeader>
+                        <CardTitle className="flex items-center justify-between">
+                          {product.name}
+                          {product.website_link && (
+                            <a 
+                              href={product.website_link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-primary hover:text-primary/80"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          )}
+                        </CardTitle>
+                        <CardDescription>{product.contact_email}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleApprove(product.id)}
+                            className="flex-1 bg-success hover:bg-success/90"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Approve
+                          </Button>
+                          <Button
+                            onClick={() => handleReject(product.id)}
+                            variant="destructive"
+                            className="flex-1"
+                          >
+                            <XCircle className="w-4 h-4 mr-2" />
+                            Reject
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 ))}
               </div>
@@ -188,7 +208,27 @@ export default function Approvals() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {approvedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <Card key={product.id} className="overflow-hidden">
+                    <CardHeader>
+                      <CardTitle className="flex items-center justify-between">
+                        {product.name}
+                        {product.website_link && (
+                          <a 
+                            href={product.website_link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary/80"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        )}
+                      </CardTitle>
+                      <CardDescription>{product.contact_email}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{product.description}</p>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
@@ -203,18 +243,36 @@ export default function Approvals() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {rejectedProducts.map((product) => (
-                  <div key={product.id} className="relative opacity-60">
-                    <ProductCard product={product} />
-                    <div className="mt-4">
-                      <Button
-                        onClick={() => handleApprove(product.id)}
-                        className="w-full"
-                        variant="outline"
-                      >
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Move to Approved
-                      </Button>
-                    </div>
+                  <div key={product.id} className="opacity-60">
+                    <Card className="overflow-hidden">
+                      <CardHeader>
+                        <CardTitle className="flex items-center justify-between">
+                          {product.name}
+                          {product.website_link && (
+                            <a 
+                              href={product.website_link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-primary hover:text-primary/80"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          )}
+                        </CardTitle>
+                        <CardDescription>{product.contact_email}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
+                        <Button
+                          onClick={() => handleApprove(product.id)}
+                          className="w-full"
+                          variant="outline"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Move to Approved
+                        </Button>
+                      </CardContent>
+                    </Card>
                   </div>
                 ))}
               </div>

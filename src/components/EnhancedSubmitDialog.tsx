@@ -179,7 +179,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
 
       if (insertError) throw insertError;
 
-      toast.success("Product submitted successfully!");
+      toast.success("Product submitted successfully! It will be reviewed before going live.");
       
       clearSavedFormData();
       localStorage.removeItem('auto_submit_after_auth');

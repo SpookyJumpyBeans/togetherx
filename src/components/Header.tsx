@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Rocket, LogIn, LogOut, User, Bell, Plus, Trophy, CheckSquare } from "lucide-react";
+import { Rocket, LogIn, LogOut, User, Bell, Plus, Trophy, CheckSquare, Package } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -127,6 +127,10 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
                   <DropdownMenuItem onClick={() => navigate("/profile")}>
                     <User className="w-4 h-4 mr-2" />
                     Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/my-products")}>
+                    <Package className="w-4 h-4 mr-2" />
+                    My Products
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="w-4 h-4 mr-2" />
