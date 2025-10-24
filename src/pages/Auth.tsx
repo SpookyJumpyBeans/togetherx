@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Handshake, Mail } from "lucide-react";
 
 export default function Auth() {
@@ -15,15 +15,32 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // Check if user is already logged in
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        // Get redirect info from URL params or localStorage
+        const returnTo = searchParams.get('returnTo') || localStorage.getItem('auth_return_to') || '/';
+        const openSubmit = searchParams.get('openSubmit') || localStorage.getItem('auth_open_submit');
+        
+        // Clear stored state
+        localStorage.removeItem('auth_return_to');
+        localStorage.removeItem('auth_open_submit');
+        
+        // Navigate and restore state
+        navigate(returnTo, { replace: true });
+        
+        if (openSubmit === 'true') {
+          // Delay to ensure page is loaded
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('openSubmitDialog'));
+          }, 100);
+        }
       }
     });
-  }, [navigate]);
+  }, [navigate, searchParams]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,11 +48,16 @@ export default function Auth() {
 
     try {
       if (isSignUp) {
+        // Build redirect URL with state preservation
+        const returnTo = searchParams.get('returnTo') || '/';
+        const openSubmit = searchParams.get('openSubmit') || '';
+        const redirectUrl = `${window.location.origin}/auth?returnTo=${encodeURIComponent(returnTo)}&openSubmit=${openSubmit}`;
+        
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: redirectUrl,
           },
         });
         
@@ -57,7 +79,18 @@ export default function Auth() {
           title: "Welcome back!",
           description: "Successfully signed in.",
         });
-        navigate("/");
+        
+        // Get redirect info and navigate
+        const returnTo = searchParams.get('returnTo') || '/';
+        const openSubmit = searchParams.get('openSubmit');
+        
+        navigate(returnTo, { replace: true });
+        
+        if (openSubmit === 'true') {
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('openSubmitDialog'));
+          }, 100);
+        }
       }
     } catch (error: any) {
       toast({
@@ -72,10 +105,15 @@ export default function Auth() {
 
   const handleGoogleSignIn = async () => {
     try {
+      // Build redirect URL with state preservation
+      const returnTo = searchParams.get('returnTo') || '/';
+      const openSubmit = searchParams.get('openSubmit') || '';
+      const redirectUrl = `${window.location.origin}/auth?returnTo=${encodeURIComponent(returnTo)}&openSubmit=${openSubmit}`;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: redirectUrl,
         },
       });
       

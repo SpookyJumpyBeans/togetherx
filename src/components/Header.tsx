@@ -3,7 +3,7 @@ import { Rocket, LogIn, LogOut, User, Bell, Plus, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { User as SupabaseUser } from "@supabase/supabase-js";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -20,6 +20,7 @@ interface HeaderProps {
 export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Subscribe first to avoid missing the initial SIGNED_IN event on redirects
@@ -37,15 +38,20 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleSubmitClick = () => {
-    if (onSubmitClick) {
-      onSubmitClick();
-    }
-  };
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate("/");
+  };
+
+  const handleSubmitClick = () => {
+    if (!user) {
+      // Store current state before redirecting to auth
+      localStorage.setItem('auth_return_to', location.pathname);
+      localStorage.setItem('auth_open_submit', 'true');
+      navigate(`/auth?returnTo=${encodeURIComponent(location.pathname)}&openSubmit=true`);
+    } else {
+      onSubmitClick?.();
+    }
   };
 
   return (

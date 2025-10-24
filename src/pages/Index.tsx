@@ -27,6 +27,13 @@ const Index = () => {
   const [displayCount, setDisplayCount] = useState(12);
   const observerTarget = useRef(null);
 
+  // Listen for custom event to reopen submit dialog after auth
+  useEffect(() => {
+    const handleOpenSubmit = () => setSubmitDialogOpen(true);
+    window.addEventListener('openSubmitDialog', handleOpenSubmit);
+    return () => window.removeEventListener('openSubmitDialog', handleOpenSubmit);
+  }, []);
+
   const categories = useMemo(() => Array.from(new Set(mockProducts.map((p) => p.category))), []);
   const audiences = useMemo(() => Array.from(new Set(mockProducts.map((p) => p.targetAudience))), []);
 
