@@ -44,38 +44,39 @@ export const SubmitProductDialog = ({ open, onOpenChange }: SubmitProductDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">Submit Your Product</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto border-0 shadow-2xl">
+        <DialogHeader className="space-y-3">
+          <DialogTitle className="text-3xl font-bold">Submit Your Product</DialogTitle>
+          <DialogDescription className="text-base">
             Join the community and discover partnership opportunities
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg">Basic Information</CardTitle>
-              <CardDescription>Tell us about your product</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-8 pt-4">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
+              <p className="text-sm text-muted-foreground mb-6">Tell us about your product</p>
+            </div>
+            <div className="space-y-6">
               <div>
-                <Label htmlFor="name">Product Name</Label>
+                <Label htmlFor="name" className="text-sm font-medium mb-2 block">Product Name</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g., CodeFlow AI"
+                  className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="screenshot">Product Screenshot</Label>
+                <Label htmlFor="screenshot" className="text-sm font-medium mb-2 block">Product Screenshot</Label>
                 <div className="mt-2">
                   <label
                     htmlFor="screenshot"
-                    className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border/50 rounded-2xl hover:border-primary/50 transition-colors cursor-pointer bg-muted/20"
+                    className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border/30 rounded-2xl hover:border-primary/50 transition-colors cursor-pointer bg-muted/10"
                   >
                     <div className="text-center">
                       <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
@@ -95,124 +96,69 @@ export const SubmitProductDialog = ({ open, onOpenChange }: SubmitProductDialogP
               </div>
 
               <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description" className="text-sm font-medium mb-2 block">Description</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="What does your product do and who does it serve?"
                   rows={3}
+                  className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none resize-none px-0"
                   required
                 />
               </div>
+            </div>
+          </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="targetAudience">Target Audience</Label>
-                  <Input
-                    id="targetAudience"
-                    value={formData.targetAudience}
-                    onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
-                    placeholder="e.g., B2B SaaS, B2C"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Input
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="e.g., MarTech, FinTech"
-                    required
-                  />
-                </div>
+          <div className="space-y-6 pt-6 border-t border-border/30">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Traction Data</h3>
+              <p className="text-sm text-muted-foreground mb-6">Share your growth metrics (optional)</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="users" className="text-sm font-medium mb-2 block">Total Users</Label>
+                <Input
+                  id="users"
+                  type="number"
+                  value={formData.users}
+                  onChange={(e) => setFormData({ ...formData, users: e.target.value })}
+                  placeholder="15000"
+                  className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
+                />
               </div>
 
               <div>
-                <Label htmlFor="tags">Keywords / Tags</Label>
+                <Label htmlFor="mau" className="text-sm font-medium mb-2 block">Monthly Active Users</Label>
                 <Input
-                  id="tags"
-                  value={formData.tags}
-                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                  placeholder="Separate with commas: AI, SEO, Marketing"
+                  id="mau"
+                  type="number"
+                  value={formData.mau}
+                  onChange={(e) => setFormData({ ...formData, mau: e.target.value })}
+                  placeholder="8500"
+                  className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
                 />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="usesAI"
-                  checked={formData.usesAI}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, usesAI: checked as boolean })
-                  }
-                />
-                <Label htmlFor="usesAI" className="cursor-pointer">
-                  This product uses AI technology
-                </Label>
               </div>
 
               <div>
-                <Label htmlFor="techHighlights">Technology Highlights</Label>
+                <Label htmlFor="revenue" className="text-sm font-medium mb-2 block">Revenue Range</Label>
                 <Input
-                  id="techHighlights"
-                  value={formData.techHighlights}
-                  onChange={(e) => setFormData({ ...formData, techHighlights: e.target.value })}
-                  placeholder="Separate with commas: REST API, WebSocket, Blockchain"
+                  id="revenue"
+                  value={formData.revenue}
+                  onChange={(e) => setFormData({ ...formData, revenue: e.target.value })}
+                  placeholder="$50k MRR"
+                  className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg">Traction Data</CardTitle>
-              <CardDescription>Share your growth metrics (optional)</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="users">Total Users</Label>
-                  <Input
-                    id="users"
-                    type="number"
-                    value={formData.users}
-                    onChange={(e) => setFormData({ ...formData, users: e.target.value })}
-                    placeholder="15000"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="mau">Monthly Active Users</Label>
-                  <Input
-                    id="mau"
-                    type="number"
-                    value={formData.mau}
-                    onChange={(e) => setFormData({ ...formData, mau: e.target.value })}
-                    placeholder="8500"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="revenue">Revenue Range</Label>
-                  <Input
-                    id="revenue"
-                    value={formData.revenue}
-                    onChange={(e) => setFormData({ ...formData, revenue: e.target.value })}
-                    placeholder="$50k MRR"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg">Partnership Opportunities</CardTitle>
-              <CardDescription>What types of partnerships are you open to?</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className="space-y-6 pt-6 border-t border-border/30">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Partnership Opportunities</h3>
+              <p className="text-sm text-muted-foreground mb-6">What types of partnerships are you open to?</p>
+            </div>
+            <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="coMarketing"
@@ -264,10 +210,10 @@ export const SubmitProductDialog = ({ open, onOpenChange }: SubmitProductDialogP
                   Open to Acquisition Offers
                 </Label>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Button type="submit" size="lg" className="w-full rounded-full">
+          <Button type="submit" size="lg" className="w-full rounded-full shadow-lg hover:shadow-xl transition-all mt-8">
             Submit Product
           </Button>
         </form>

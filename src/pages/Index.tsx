@@ -5,10 +5,10 @@ import { ProductCard } from "@/components/ProductCard";
 import { mockProducts } from "@/data/mockProducts";
 import { SubmitProductDialog } from "@/components/SubmitProductDialog";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
-import { Rocket, Search, SlidersHorizontal } from "lucide-react";
+import { Rocket, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Product } from "@/components/ProductCard";
 
 const Index = () => {
@@ -19,6 +19,8 @@ const Index = () => {
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [displayCount, setDisplayCount] = useState(12);
+  const observerTarget = useRef(null);
 
   const categories = useMemo(() => Array.from(new Set(mockProducts.map((p) => p.category))), []);
   const audiences = useMemo(() => Array.from(new Set(mockProducts.map((p) => p.targetAudience))), []);
@@ -46,8 +48,42 @@ const Index = () => {
         })();
 
         return matchesSearch && matchesCategory && matchesAudience && matchesUsers;
-      })
-      .slice(0, 20);
+      });
+  }, [searchQuery, categoryFilter, audienceFilter, userFilter]);
+
+  const displayedProducts = useMemo(() => {
+    return filteredProducts.slice(0, displayCount);
+  }, [filteredProducts, displayCount]);
+
+  const loadMore = useCallback(() => {
+    if (displayCount < filteredProducts.length) {
+      setDisplayCount(prev => Math.min(prev + 12, filteredProducts.length));
+    }
+  }, [displayCount, filteredProducts.length]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [loadMore]);
+
+  useEffect(() => {
+    setDisplayCount(12);
   }, [searchQuery, categoryFilter, audienceFilter, userFilter]);
 
   const handleProductClick = (product: Product) => {
@@ -56,41 +92,39 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header onSubmitClick={() => setSubmitDialogOpen(true)} />
       
       {/* Hero Section */}
-      <section className="container mx-auto px-4 md:px-6 pt-12 md:pt-16 pb-8 md:pb-12">
-        <div className="max-w-3xl mx-auto text-center space-y-5">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight">
+      <section className="container mx-auto px-6 md:px-8 pt-16 md:pt-24 pb-12 md:pb-16">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
             A community where founders{" "}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
-              scale each other
+              scale together
             </span>
           </h1>
-          <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Discover partnership opportunities — co-marketing, white-label, acquisitions, and more.
           </p>
           <Button 
             size="lg" 
-            className="gap-2 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+            className="gap-2 rounded-full shadow-lg hover:shadow-xl transition-all px-8 py-6 text-base"
             onClick={() => setSubmitDialogOpen(true)}
           >
-            <Rocket className="w-4 h-4" />
+            <Rocket className="w-5 h-5" />
             Submit Your Product
           </Button>
         </div>
       </section>
 
       {/* Filters Section */}
-      <section className="container mx-auto px-4 md:px-6 py-6 md:py-8">
-        <div className="max-w-6xl mx-auto space-y-4">
-          {/* Search and Filters Row */}
-          <div className="flex flex-col md:flex-row gap-3 items-center">
-            <div className="flex gap-3 flex-wrap md:flex-nowrap w-full md:w-auto">
+      <section className="container mx-auto px-6 md:px-8 py-12">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
+            <div className="flex gap-4 flex-wrap lg:flex-nowrap flex-1">
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-full md:w-[180px] rounded-full border-border/50 bg-background/50 backdrop-blur-sm">
-                  <SlidersHorizontal className="w-4 h-4 mr-2" />
+                <SelectTrigger className="w-full lg:w-[200px] h-12 rounded-full border-0 border-b-2 border-border/50 bg-transparent hover:border-primary/50 transition-colors focus:border-primary shadow-none px-4">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -102,7 +136,7 @@ const Index = () => {
               </Select>
 
               <Select value={audienceFilter} onValueChange={setAudienceFilter}>
-                <SelectTrigger className="w-full md:w-[180px] rounded-full border-border/50 bg-background/50 backdrop-blur-sm">
+                <SelectTrigger className="w-full lg:w-[200px] h-12 rounded-full border-0 border-b-2 border-border/50 bg-transparent hover:border-primary/50 transition-colors focus:border-primary shadow-none px-4">
                   <SelectValue placeholder="Audience" />
                 </SelectTrigger>
                 <SelectContent>
@@ -114,7 +148,7 @@ const Index = () => {
               </Select>
 
               <Select value={userFilter} onValueChange={setUserFilter}>
-                <SelectTrigger className="w-full md:w-[180px] rounded-full border-border/50 bg-background/50 backdrop-blur-sm">
+                <SelectTrigger className="w-full lg:w-[200px] h-12 rounded-full border-0 border-b-2 border-border/50 bg-transparent hover:border-primary/50 transition-colors focus:border-primary shadow-none px-4">
                   <SelectValue placeholder="Users" />
                 </SelectTrigger>
                 <SelectContent>
@@ -127,14 +161,14 @@ const Index = () => {
               </Select>
             </div>
 
-            <div className="relative w-full md:w-64">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <div className="relative w-full lg:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 h-11 rounded-full border-border/50 bg-background/50 backdrop-blur-sm"
+                className="pl-12 h-12 rounded-full border-0 border-b-2 border-border/50 bg-transparent hover:border-primary/50 transition-colors focus:border-primary shadow-none"
               />
             </div>
           </div>
@@ -142,19 +176,25 @@ const Index = () => {
       </section>
 
       {/* Products Grid */}
-      <section id="products" className="container mx-auto px-4 md:px-6 pb-12 flex-1">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {filteredProducts.map((product) => (
-              <div key={product.id} onClick={() => handleProductClick(product)}>
+      <section id="products" className="container mx-auto px-6 md:px-8 pb-16 flex-1">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {displayedProducts.map((product) => (
+              <div key={product.id} onClick={() => handleProductClick(product)} className="animate-fade-in">
                 <ProductCard product={product} />
               </div>
             ))}
           </div>
 
           {filteredProducts.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No products found matching your filters.</p>
+            <div className="text-center py-20">
+              <p className="text-muted-foreground text-lg">No products found matching your filters.</p>
+            </div>
+          )}
+
+          {displayedProducts.length < filteredProducts.length && (
+            <div ref={observerTarget} className="h-20 flex items-center justify-center mt-8">
+              <div className="animate-pulse text-muted-foreground">Loading more...</div>
             </div>
           )}
         </div>
