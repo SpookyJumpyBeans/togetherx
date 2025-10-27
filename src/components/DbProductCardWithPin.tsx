@@ -40,16 +40,13 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
   const [isPinned, setIsPinned] = useState(false);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Get all available images
-  const images = product.screenshot_urls && product.screenshot_urls.length > 0 
-    ? product.screenshot_urls 
+  // Get the first image for the card cover
+  const coverImage = product.screenshot_urls && product.screenshot_urls.length > 0 
+    ? product.screenshot_urls[0]
     : product.screenshot_url 
-    ? [product.screenshot_url] 
-    : ["https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop"];
-
-  const hasMultipleImages = images.length > 1;
+    ? product.screenshot_url
+    : "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop";
 
   useEffect(() => {
     checkUser();
@@ -109,16 +106,6 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
     setLoading(false);
   };
 
-  const handlePrevImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
-
-  const handleNextImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
-
   return (
     <div className="relative">
       <Card 
@@ -129,8 +116,8 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
           {/* Product Image */}
           <div className="w-full aspect-[4/3] overflow-hidden bg-muted/10 relative">
             <img
-              src={images[currentImageIndex]}
-              alt={`${product.name} - Image ${currentImageIndex + 1}`}
+              src={coverImage}
+              alt={product.name}
               className="w-full h-full object-cover"
             />
             {/* Badges on Image */}
@@ -142,37 +129,6 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
                 </div>
               )}
             </div>
-            {/* Image Navigation */}
-            {hasMultipleImages && (
-              <>
-                <Button
-                  onClick={handlePrevImage}
-                  size="sm"
-                  variant="secondary"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full h-8 w-8 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <Button
-                  onClick={handleNextImage}
-                  size="sm"
-                  variant="secondary"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full h-8 w-8 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                  {images.map((_, idx) => (
-                    <div
-                      key={idx}
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        idx === currentImageIndex ? "bg-background" : "bg-background/50"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
           </div>
           
           <div className="p-5 flex-1 flex flex-col">

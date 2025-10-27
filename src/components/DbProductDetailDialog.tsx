@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mail, Globe, Calendar } from "lucide-react";
+import { Mail, Globe, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -15,6 +15,7 @@ export interface DbProduct {
   contact_email?: string;
   created_at?: string;
   screenshot_url?: string;
+  screenshot_urls?: string[];
   logo_url?: string;
   target_audience?: string;
   category?: string;
@@ -29,6 +30,7 @@ export interface DbProduct {
   white_label?: boolean;
   reseller?: boolean;
   acquisition?: boolean;
+  acquisition_details?: string;
 }
 
 interface DbProductDetailDialogProps {
@@ -40,6 +42,16 @@ interface DbProductDetailDialogProps {
 export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProductDetailDialogProps) => {
   const [user, setUser] = useState<any>(null);
   const [contacting, setContacting] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Get all available images
+  const images = product?.screenshot_urls && product.screenshot_urls.length > 0 
+    ? product.screenshot_urls 
+    : product?.screenshot_url 
+    ? [product.screenshot_url] 
+    : ["https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop"];
+
+  const hasMultipleImages = images.length > 1;
 
   useEffect(() => {
     checkUser();
@@ -98,6 +110,19 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
     }
   };
 
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  // Reset image index when dialog opens/closes or product changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [open, product?.id]);
+
   if (!product) return null;
 
   const partnershipTypes = [
@@ -116,13 +141,44 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
           <DialogDescription>View product information and contact the founder</DialogDescription>
         </DialogHeader>
         <div className="space-y-8 py-6">
-          {/* Screenshot */}
-          <div className="w-full h-64 bg-muted rounded-xl overflow-hidden">
+          {/* Screenshot with Carousel */}
+          <div className="w-full h-64 bg-muted rounded-xl overflow-hidden relative">
             <img
-              src={product?.screenshot_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop"}
-              alt={product?.name}
+              src={images[currentImageIndex]}
+              alt={`${product?.name} - Image ${currentImageIndex + 1}`}
               className="w-full h-full object-cover"
             />
+            {/* Image Navigation */}
+            {hasMultipleImages && (
+              <>
+                <Button
+                  onClick={handlePrevImage}
+                  size="sm"
+                  variant="secondary"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full h-10 w-10 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </Button>
+                <Button
+                  onClick={handleNextImage}
+                  size="sm"
+                  variant="secondary"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full h-10 w-10 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </Button>
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+                  {images.map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        idx === currentImageIndex ? "bg-background w-6" : "bg-background/50"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Header with Logo */}
@@ -218,6 +274,14 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
                   <Badge key={type.key}>{type.label}</Badge>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Acquisition Details */}
+          {product?.acquisition_details && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-muted-foreground">Acquisition Details</h3>
+              <p className="text-sm">{product.acquisition_details}</p>
             </div>
           )}
 

@@ -209,7 +209,7 @@ const Index = () => {
       {/* Products Grid */}
       <section id="products" className="container mx-auto px-6 md:px-8 pb-20 flex-1">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {displayedProducts.map((product) => (
               <DbProductCardWithPin
                 key={product.id}
