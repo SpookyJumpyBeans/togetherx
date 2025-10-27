@@ -96,3 +96,26 @@ end $$;
 
 -- Refresh API cache
 select pg_notify('pgrst','reload schema');
+
+-- 3) Secure aggregated contacts function for public/anon access
+-- Returns per-product counts for the current month start you pass in
+create or replace function public.get_monthly_contact_counts(month_start_input timestamptz)
+returns table (
+  product_id uuid,
+  contact_count integer
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select pc.product_id, count(*)::int as contact_count
+  from public.product_contacts pc
+  where pc.contacted_at >= month_start_input
+  group by pc.product_id
+$$;
+
+-- Allow anonymous and authenticated clients to execute the function
+grant execute on function public.get_monthly_contact_counts(timestamptz) to anon, authenticated;
+
+-- Refresh API cache so the RPC becomes available immediately
+select pg_notify('pgrst','reload schema');

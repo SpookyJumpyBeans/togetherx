@@ -21,45 +21,59 @@ export const TractionLeaderboard = () => {
   }, []);
 
   const loadLeaderboard = async () => {
-    // Get current month's start date
+    setLoading(true);
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-    // Count contacts per product for current month (excluding product owner's own contacts)
-    const { data: contactData, error: contactError } = await supabase
-      .from('product_contacts')
-      .select('product_id')
-      .gte('contacted_at', monthStart);
+    try {
+      // Prefer a secure RPC that aggregates counts server-side (works even when signed out)
+      const { data: rpcData, error: rpcError } = await supabase
+        .rpc('get_monthly_contact_counts', { month_start_input: monthStart });
 
-    if (contactError) {
-      console.error('Error loading contacts:', contactError);
-      setLoading(false);
-      return;
-    }
+      let contactCounts: Record<string, number> = {};
 
-    // Count contacts by product
-    const contactCounts: Record<string, number> = {};
-    contactData?.forEach((contact: any) => {
-      contactCounts[contact.product_id] = (contactCounts[contact.product_id] || 0) + 1;
-    });
+      if (!rpcError && rpcData) {
+        rpcData.forEach((row: any) => {
+          contactCounts[row.product_id] = Number(row.contact_count) || 0;
+        });
+      } else {
+        // Fallback to client-side counting if RPC isn't available
+        const { data: contactData, error: contactError } = await supabase
+          .from('product_contacts')
+          .select('product_id')
+          .gte('contacted_at', monthStart);
 
-    // Get product details for those with contacts
-    const productIds = Object.keys(contactCounts);
-    if (productIds.length === 0) {
-      setLeaderboard([]);
-      setLoading(false);
-      return;
-    }
+        if (contactError) {
+          console.error('Error loading contacts:', contactError);
+          setLeaderboard([]);
+          setLoading(false);
+          return;
+        }
 
-    const { data: products, error: productsError } = await supabase
-      .from('products')
-      .select('id, name, category, logo_url')
-      .eq('approval_status', 'approved')
-      .in('id', productIds);
+        contactData?.forEach((contact: any) => {
+          contactCounts[contact.product_id] = (contactCounts[contact.product_id] || 0) + 1;
+        });
+      }
 
-    if (!productsError && products) {
-      // Combine and sort
-      const combined = products
+      const productIds = Object.keys(contactCounts);
+      if (productIds.length === 0) {
+        setLeaderboard([]);
+        return;
+      }
+
+      const { data: products, error: productsError } = await supabase
+        .from('products')
+        .select('id, name, category, logo_url')
+        .eq('approval_status', 'approved')
+        .in('id', productIds);
+
+      if (productsError) {
+        console.error('Error loading products:', productsError);
+        setLeaderboard([]);
+        return;
+      }
+
+      const combined = (products || [])
         .map(p => ({
           id: p.id,
           name: p.name,
@@ -69,10 +83,14 @@ export const TractionLeaderboard = () => {
         }))
         .sort((a, b) => b.monthly_contacts - a.monthly_contacts)
         .slice(0, 10);
-      
+
       setLeaderboard(combined);
+    } catch (e) {
+      console.error('Unexpected error loading leaderboard:', e);
+      setLeaderboard([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (loading) {
