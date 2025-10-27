@@ -33,8 +33,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
   const [formData, setFormData] = useState({
     name: "",
     websiteLink: "",
-    screenshot: null as File | null,
-    screenshotPreview: "",
+    screenshots: [] as File[],
     logo: null as File | null,
     logoPreview: "",
     description: "",
@@ -82,8 +81,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
   const saveFormData = () => {
     const dataToSave = {
       ...formData,
-      screenshot: null,
-      screenshotPreview: formData.screenshotPreview,
+      screenshots: [],
       logo: null,
       logoPreview: formData.logoPreview,
       usersFile: null,
@@ -111,15 +109,8 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
   };
 
   const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData({ ...formData, screenshot: file });
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, screenshotPreview: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
-    }
+    const files = Array.from(e.target.files || []);
+    setFormData(prev => ({ ...prev, screenshots: [...prev.screenshots, ...files] }));
   };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,17 +132,11 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      setFormData({ ...formData, screenshot: file });
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, screenshotPreview: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
-    }
+  const removeScreenshot = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      screenshots: prev.screenshots.filter((_, i) => i !== index)
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -195,36 +180,41 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     setLoading(true);
 
     try {
-      let screenshotUrl = null;
+      let screenshotUrls: string[] = [];
       let logoUrl = null;
 
-      // Upload screenshot if provided
-      if (formData.screenshot) {
-        const screenshotExt = formData.screenshot.name.split('.').pop();
-        const screenshotPath = `${user.id}/${Date.now()}-screenshot.${screenshotExt}`;
-        const { error: screenshotUploadError } = await supabase.storage
-          .from('product-images')
-          .upload(screenshotPath, formData.screenshot);
-        
-        if (!screenshotUploadError) {
+      // Upload screenshots if provided
+      if (formData.screenshots.length > 0) {
+        const uploadPromises = formData.screenshots.map(async (file) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${user.id}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+          const { error: uploadError, data } = await supabase.storage
+            .from('product-assets')
+            .upload(fileName, file);
+          
+          if (uploadError) throw uploadError;
+          
           const { data: { publicUrl } } = supabase.storage
-            .from('product-images')
-            .getPublicUrl(screenshotPath);
-          screenshotUrl = publicUrl;
-        }
+            .from('product-assets')
+            .getPublicUrl(fileName);
+          
+          return publicUrl;
+        });
+        
+        screenshotUrls = await Promise.all(uploadPromises);
       }
 
       // Upload logo if provided
       if (formData.logo) {
         const logoExt = formData.logo.name.split('.').pop();
-        const logoPath = `${user.id}/${Date.now()}-logo.${logoExt}`;
+        const logoPath = `${user.id}/logo_${Date.now()}.${logoExt}`;
         const { error: logoUploadError } = await supabase.storage
-          .from('product-images')
+          .from('product-assets')
           .upload(logoPath, formData.logo);
         
         if (!logoUploadError) {
           const { data: { publicUrl } } = supabase.storage
-            .from('product-images')
+            .from('product-assets')
             .getPublicUrl(logoPath);
           logoUrl = publicUrl;
         }
@@ -238,8 +228,8 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
           website_link: formData.websiteLink,
           description: formData.description,
           contact_email: formData.contactEmail,
-          screenshot_url: screenshotUrl,
-          logo_url: logoUrl,
+          screenshot_urls: screenshotUrls.length > 0 ? screenshotUrls : null,
+          logo_url: logoUrl || null,
           target_audience: formData.targetAudience.length > 0 ? formData.targetAudience.join(', ') : null,
           category: formData.category.length > 0 ? formData.category.join(', ') : null,
           tags: formData.tags.length > 0 ? formData.tags.join(', ') : null,
@@ -267,8 +257,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
       setFormData({
         name: "",
         websiteLink: "",
-        screenshot: null,
-        screenshotPreview: "",
+        screenshots: [],
         logo: null,
         logoPreview: "",
         description: "",
@@ -378,41 +367,33 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
             </div>
           </div>
 
-          {/* Product Screenshot */}
-          <div className="space-y-2">
-            <Label className="text-base">Product Screenshot</Label>
-            <div
-              onDrop={handleDrop}
-              onDragOver={(e) => e.preventDefault()}
-              className="relative"
-            >
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleScreenshotChange}
-                className="hidden"
-                id="screenshot-upload"
-              />
-              <label
-                htmlFor="screenshot-upload"
-                className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-xl hover:border-foreground/20 transition-colors cursor-pointer bg-muted/10"
-              >
-                {formData.screenshotPreview ? (
-                  <img
-                    src={formData.screenshotPreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                ) : (
-                  <div className="text-center p-8">
-                    <p className="text-base font-medium mb-1">
-                      Drag & drop your screenshot here
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      or click to browse
-                    </p>
+          {/* Product Screenshots */}
+          <div className="space-y-3">
+            <Label className="text-base">Product Screenshots</Label>
+            {formData.screenshots.length > 0 && (
+              <div className="grid grid-cols-2 gap-3">
+                {formData.screenshots.map((file, idx) => (
+                  <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border">
+                    <img src={URL.createObjectURL(file)} alt={`Screenshot ${idx + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeScreenshot(idx)}
+                      className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                    >
+                      <span className="sr-only">Remove</span>
+                      ×
+                    </button>
                   </div>
-                )}
+                ))}
+              </div>
+            )}
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl hover:border-foreground/20 transition-colors cursor-pointer bg-muted/10">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <p className="text-base font-medium mb-1">Click to upload screenshots</p>
+                  <p className="text-sm text-muted-foreground">PNG, JPG or WEBP</p>
+                </div>
+                <input type="file" className="hidden" accept="image/*" multiple onChange={handleScreenshotChange} />
               </label>
             </div>
           </div>

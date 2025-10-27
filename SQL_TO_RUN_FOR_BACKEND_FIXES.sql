@@ -138,5 +138,36 @@ add column if not exists acquisition_details text;
 alter table public.products 
 add column if not exists screenshot_urls text[];
 
+-- 8) Create storage bucket for product assets (screenshots and logos)
+insert into storage.buckets (id, name, public)
+values ('product-assets', 'product-assets', true)
+on conflict (id) do nothing;
+
+-- 9) Storage RLS policies for product-assets bucket
+create policy "Anyone can view product assets"
+on storage.objects for select
+using (bucket_id = 'product-assets');
+
+create policy "Authenticated users can upload product assets"
+on storage.objects for insert
+with check (
+  bucket_id = 'product-assets' 
+  and auth.role() = 'authenticated'
+);
+
+create policy "Users can update their own product assets"
+on storage.objects for update
+using (
+  bucket_id = 'product-assets' 
+  and auth.uid()::text = (storage.foldername(name))[1]
+);
+
+create policy "Users can delete their own product assets"
+on storage.objects for delete
+using (
+  bucket_id = 'product-assets' 
+  and auth.uid()::text = (storage.foldername(name))[1]
+);
+
 -- Refresh API cache
 select pg_notify('pgrst','reload schema');
