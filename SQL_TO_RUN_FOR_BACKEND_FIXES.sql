@@ -124,5 +124,11 @@ select pg_notify('pgrst','reload schema');
 alter table public.products 
 add column if not exists show_on_leaderboard boolean default false;
 
+-- 5) Convert traction metric columns to text (they store ranges, not numbers)
+alter table public.products 
+alter column users type text using users::text,
+alter column revenue type text using revenue::text,
+alter column growth_rate type text using growth_rate::text;
+
 -- Refresh API cache
 select pg_notify('pgrst','reload schema');
