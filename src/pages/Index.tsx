@@ -6,17 +6,20 @@ import { ContactDialog } from "@/components/ContactDialog";
 import { Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TagSelector } from "@/components/ui/tag-selector";
 import { useState, useMemo, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { DbProductCardWithPin, DbProduct } from "@/components/DbProductCardWithPin";
 import { DbProductDetailDialog } from "@/components/DbProductDetailDialog";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { TARGET_AUDIENCE_SUGGESTIONS, CATEGORY_SUGGESTIONS, USER_RANGES } from "@/data/tagSuggestions";
+import { isWithinInterval, subDays, subWeeks, subMonths, subYears, startOfDay } from "date-fns";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [audienceFilter, setAudienceFilter] = useState<string>("all");
-  const [userFilter, setUserFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [audienceFilter, setAudienceFilter] = useState<string[]>([]);
+  const [userFilter, setUserFilter] = useState<string[]>([]);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [selectedDbProduct, setSelectedDbProduct] = useState<DbProduct | null>(null);
   const [dbDetailDialogOpen, setDbDetailDialogOpen] = useState(false);
@@ -64,39 +67,85 @@ const Index = () => {
     return () => { mounted = false; };
   }, []);
 
-  const categories = useMemo(() => {
-    return Array.from(new Set(approvedProducts.map(p => p.category).filter(Boolean)));
-  }, [approvedProducts]);
-  
-  const audiences = useMemo(() => {
-    return Array.from(new Set(approvedProducts.map(p => p.target_audience).filter(Boolean)));
-  }, [approvedProducts]);
-
   const filteredProducts = useMemo(() => {
     return approvedProducts.filter((product) => {
-      const matchesSearch =
-        searchQuery === "" ||
-        product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category?.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
-      const matchesAudience = audienceFilter === "all" || product.target_audience === audienceFilter;
-      
-      const matchesUsers = (() => {
-        if (userFilter === "all") return true;
-        if (!product.users) return false;
-        const users = typeof product.users === 'string' ? parseInt(product.users) : product.users;
-        if (userFilter === "0-1k") return users < 1000;
-        if (userFilter === "1k-10k") return users >= 1000 && users < 10000;
-        if (userFilter === "10k-50k") return users >= 10000 && users < 50000;
-        if (userFilter === "50k+") return users >= 50000;
-        return true;
+      // Search filter - matches keywords in name, description, category, tags, and other fields
+      const matchesSearch = (() => {
+        if (searchQuery === "") return true;
+        const query = searchQuery.toLowerCase();
+        const searchableFields = [
+          product.name,
+          product.description,
+          product.category,
+          product.tags,
+          product.target_audience,
+          product.tech_highlights,
+        ].filter(Boolean).join(' ').toLowerCase();
+        return searchableFields.includes(query);
       })();
 
-      return matchesSearch && matchesCategory && matchesAudience && matchesUsers;
+      // Category filter - supports multiple tags
+      const matchesCategory = (() => {
+        if (categoryFilter.length === 0) return true;
+        if (!product.category) return false;
+        const productCategories = product.category.split(',').map((c: string) => c.trim().toLowerCase());
+        return categoryFilter.some(filter => 
+          productCategories.some((cat: string) => cat.includes(filter.toLowerCase()))
+        );
+      })();
+
+      // Audience filter - supports multiple tags
+      const matchesAudience = (() => {
+        if (audienceFilter.length === 0) return true;
+        if (!product.target_audience) return false;
+        const productAudiences = product.target_audience.split(',').map((a: string) => a.trim().toLowerCase());
+        return audienceFilter.some(filter => 
+          productAudiences.some((aud: string) => aud.includes(filter.toLowerCase()))
+        );
+      })();
+      
+      // User filter - supports multiple ranges
+      const matchesUsers = (() => {
+        if (userFilter.length === 0) return true;
+        if (!product.users) return false;
+        const users = typeof product.users === 'string' ? parseInt(product.users) : product.users;
+        
+        return userFilter.some(range => {
+          if (range === "0-1k" || range === "0-1k users") return users < 1000;
+          if (range === "1k-10k" || range === "1k-10k users") return users >= 1000 && users < 10000;
+          if (range === "10k-50k" || range === "10k-50k users") return users >= 10000 && users < 50000;
+          if (range === "50k-100k" || range === "50k-100k users") return users >= 50000 && users < 100000;
+          if (range === "100k+" || range === "100k+ users") return users >= 100000;
+          return false;
+        });
+      })();
+
+      // Date filter - filters by created_at timestamp
+      const matchesDate = (() => {
+        if (dateFilter === "all") return true;
+        if (!product.created_at) return false;
+        
+        const productDate = new Date(product.created_at);
+        const now = new Date();
+        const todayStart = startOfDay(now);
+        
+        switch (dateFilter) {
+          case "today":
+            return isWithinInterval(productDate, { start: todayStart, end: now });
+          case "week":
+            return isWithinInterval(productDate, { start: subWeeks(now, 1), end: now });
+          case "month":
+            return isWithinInterval(productDate, { start: subMonths(now, 1), end: now });
+          case "year":
+            return isWithinInterval(productDate, { start: subYears(now, 1), end: now });
+          default:
+            return true;
+        }
+      })();
+
+      return matchesSearch && matchesCategory && matchesAudience && matchesUsers && matchesDate;
     });
-  }, [approvedProducts, searchQuery, categoryFilter, audienceFilter, userFilter]);
+  }, [approvedProducts, searchQuery, categoryFilter, audienceFilter, userFilter, dateFilter]);
 
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
 
@@ -142,66 +191,68 @@ const Index = () => {
 
       {/* Filters Section */}
       <section className="container mx-auto px-6 md:px-8 py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
-            <div className="flex gap-3 flex-wrap lg:flex-nowrap">
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-full lg:w-[160px] h-11 rounded-lg border-border bg-background">
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={audienceFilter} onValueChange={setAudienceFilter}>
-                <SelectTrigger className="w-full lg:w-[160px] h-11 rounded-lg border-border bg-background">
-                  <SelectValue placeholder="All Audiences" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Audiences</SelectItem>
-                  {audiences.map((aud) => (
-                    <SelectItem key={aud} value={aud}>{aud}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={userFilter} onValueChange={setUserFilter}>
-                <SelectTrigger className="w-full lg:w-[160px] h-11 rounded-lg border-border bg-background">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="0-1k">0-1k users</SelectItem>
-                  <SelectItem value="1k-10k">1k-10k users</SelectItem>
-                  <SelectItem value="10k-50k">10k-50k users</SelectItem>
-                  <SelectItem value="50k+">50k+ users</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={dateFilter} onValueChange={setDateFilter}>
-                <SelectTrigger className="w-full lg:w-[160px] h-11 rounded-lg border-border bg-background">
-                  <SelectValue placeholder="All Time" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Time</SelectItem>
-                  <SelectItem value="week">This Week</SelectItem>
-                  <SelectItem value="month">This Month</SelectItem>
-                  <SelectItem value="year">This Year</SelectItem>
-                </SelectContent>
-              </Select>
+        <div className="max-w-7xl mx-auto space-y-4">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 space-y-3">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Categories</label>
+                <TagSelector
+                  value={categoryFilter}
+                  onChange={setCategoryFilter}
+                  suggestions={CATEGORY_SUGGESTIONS}
+                  placeholder="Filter by categories..."
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Target Audience</label>
+                <TagSelector
+                  value={audienceFilter}
+                  onChange={setAudienceFilter}
+                  suggestions={TARGET_AUDIENCE_SUGGESTIONS}
+                  placeholder="Filter by audience..."
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">User Count</label>
+                <TagSelector
+                  value={userFilter}
+                  onChange={setUserFilter}
+                  suggestions={USER_RANGES}
+                  placeholder="Filter by user count..."
+                />
+              </div>
             </div>
 
-            <Input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full lg:w-80 h-11 rounded-lg border-border bg-background px-4 placeholder:text-muted-foreground"
-            />
+            <div className="flex flex-col gap-3 lg:w-96">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Time Period</label>
+                <Select value={dateFilter} onValueChange={setDateFilter}>
+                  <SelectTrigger className="h-11 rounded-lg border-border bg-background">
+                    <SelectValue placeholder="All Time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="today">Today</SelectItem>
+                    <SelectItem value="week">This Week</SelectItem>
+                    <SelectItem value="month">This Month</SelectItem>
+                    <SelectItem value="year">This Year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Search</label>
+                <Input
+                  type="text"
+                  placeholder="Search by name, description, tags..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-11 rounded-lg border-border bg-background px-4 placeholder:text-muted-foreground"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
