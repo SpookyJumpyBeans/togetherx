@@ -12,7 +12,7 @@ import { supabase } from "@/lib/supabase";
 import { DbProductCardWithPin, DbProduct } from "@/components/DbProductCardWithPin";
 import { DbProductDetailDialog } from "@/components/DbProductDetailDialog";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { TARGET_AUDIENCE_SUGGESTIONS, CATEGORY_SUGGESTIONS, USER_RANGES } from "@/data/tagSuggestions";
+import { TARGET_AUDIENCE_SUGGESTIONS, CATEGORY_SUGGESTIONS, USER_RANGES, REVENUE_RANGES } from "@/data/tagSuggestions";
 import { isWithinInterval, subDays, subWeeks, subMonths, subYears, startOfDay } from "date-fns";
 
 const Index = () => {
@@ -20,6 +20,7 @@ const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
   const [audienceFilter, setAudienceFilter] = useState<string[]>([]);
   const [userFilter, setUserFilter] = useState<string[]>([]);
+  const [revenueFilter, setRevenueFilter] = useState<string[]>([]);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [selectedDbProduct, setSelectedDbProduct] = useState<DbProduct | null>(null);
   const [dbDetailDialogOpen, setDbDetailDialogOpen] = useState(false);
@@ -108,14 +109,45 @@ const Index = () => {
       const matchesUsers = (() => {
         if (userFilter.length === 0) return true;
         if (!product.users) return false;
-        const users = typeof product.users === 'string' ? parseInt(product.users) : product.users;
+        const users = typeof product.users === 'string' ? parseInt(product.users.replace(/,/g, '')) : product.users;
         
         return userFilter.some(range => {
-          if (range === "0-1k" || range === "0-1k users") return users < 1000;
-          if (range === "1k-10k" || range === "1k-10k users") return users >= 1000 && users < 10000;
-          if (range === "10k-50k" || range === "10k-50k users") return users >= 10000 && users < 50000;
-          if (range === "50k-100k" || range === "50k-100k users") return users >= 50000 && users < 100000;
-          if (range === "100k+" || range === "100k+ users") return users >= 100000;
+          if (range === "0-100") return users >= 0 && users <= 100;
+          if (range === "100-1,000") return users > 100 && users <= 1000;
+          if (range === "1,000-10,000") return users > 1000 && users <= 10000;
+          if (range === "10,000-100,000") return users > 10000 && users <= 100000;
+          if (range === "100,000-1M") return users > 100000 && users <= 1000000;
+          if (range === "1M-10M") return users > 1000000 && users <= 10000000;
+          if (range === "10M+") return users > 10000000;
+          return false;
+        });
+      })();
+
+      // Revenue filter - supports multiple ranges
+      const matchesRevenue = (() => {
+        if (revenueFilter.length === 0) return true;
+        if (!product.revenue) return false;
+        
+        // Extract numeric value from revenue string (e.g., "$5k MRR" -> 5000)
+        const revenueStr = product.revenue.toString().toLowerCase();
+        let revenueValue = 0;
+        
+        if (revenueStr.includes('k')) {
+          revenueValue = parseFloat(revenueStr.replace(/[^0-9.]/g, '')) * 1000;
+        } else if (revenueStr.includes('m')) {
+          revenueValue = parseFloat(revenueStr.replace(/[^0-9.]/g, '')) * 1000000;
+        } else {
+          revenueValue = parseFloat(revenueStr.replace(/[^0-9.]/g, ''));
+        }
+        
+        return revenueFilter.some(range => {
+          if (range === "$0-$1k MRR") return revenueValue >= 0 && revenueValue < 1000;
+          if (range === "$1k-$10k MRR") return revenueValue >= 1000 && revenueValue < 10000;
+          if (range === "$10k-$50k MRR") return revenueValue >= 10000 && revenueValue < 50000;
+          if (range === "$50k-$100k MRR") return revenueValue >= 50000 && revenueValue < 100000;
+          if (range === "$100k-$500k MRR") return revenueValue >= 100000 && revenueValue < 500000;
+          if (range === "$500k-$1M MRR") return revenueValue >= 500000 && revenueValue < 1000000;
+          if (range === "$1M+ MRR") return revenueValue >= 1000000;
           return false;
         });
       })();
@@ -143,9 +175,9 @@ const Index = () => {
         }
       })();
 
-      return matchesSearch && matchesCategory && matchesAudience && matchesUsers && matchesDate;
+      return matchesSearch && matchesCategory && matchesAudience && matchesUsers && matchesRevenue && matchesDate;
     });
-  }, [approvedProducts, searchQuery, categoryFilter, audienceFilter, userFilter, dateFilter]);
+  }, [approvedProducts, searchQuery, categoryFilter, audienceFilter, userFilter, revenueFilter, dateFilter]);
 
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
 
@@ -157,7 +189,7 @@ const Index = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, categoryFilter, audienceFilter, userFilter]);
+  }, [searchQuery, categoryFilter, audienceFilter, userFilter, revenueFilter, dateFilter]);
 
   const handleDbProductClick = (product: DbProduct) => {
     setSelectedDbProduct(product);
@@ -221,6 +253,16 @@ const Index = () => {
                   onChange={setUserFilter}
                   suggestions={USER_RANGES}
                   placeholder="Filter by user count..."
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Revenue</label>
+                <TagSelector
+                  value={revenueFilter}
+                  onChange={setRevenueFilter}
+                  suggestions={REVENUE_RANGES}
+                  placeholder="Filter by revenue..."
                 />
               </div>
             </div>
