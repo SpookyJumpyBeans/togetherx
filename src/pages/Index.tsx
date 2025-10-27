@@ -7,6 +7,8 @@ import { Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TagSelector } from "@/components/ui/tag-selector";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { useState, useMemo, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { DbProductCardWithPin, DbProduct } from "@/components/DbProductCardWithPin";
@@ -217,22 +219,50 @@ const Index = () => {
               
               <div className="space-y-2">
                 <label className="text-sm font-medium">User Count</label>
-                <TagSelector
-                  value={userFilter}
-                  onChange={setUserFilter}
-                  suggestions={USER_RANGES}
-                  placeholder="Filter by user count..."
-                />
+                <div className="border border-border rounded-lg p-3 bg-background space-y-2 max-h-60 overflow-y-auto">
+                  {USER_RANGES.map((range) => (
+                    <div key={range} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`user-${range}`}
+                        checked={userFilter.includes(range)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setUserFilter([...userFilter, range]);
+                          } else {
+                            setUserFilter(userFilter.filter(r => r !== range));
+                          }
+                        }}
+                      />
+                      <Label htmlFor={`user-${range}`} className="text-sm cursor-pointer">
+                        {range}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
               </div>
               
               <div className="space-y-2">
                 <label className="text-sm font-medium">Revenue</label>
-                <TagSelector
-                  value={revenueFilter}
-                  onChange={setRevenueFilter}
-                  suggestions={REVENUE_RANGES}
-                  placeholder="Filter by revenue..."
-                />
+                <div className="border border-border rounded-lg p-3 bg-background space-y-2 max-h-60 overflow-y-auto">
+                  {REVENUE_RANGES.map((range) => (
+                    <div key={range} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`revenue-${range}`}
+                        checked={revenueFilter.includes(range)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setRevenueFilter([...revenueFilter, range]);
+                          } else {
+                            setRevenueFilter(revenueFilter.filter(r => r !== range));
+                          }
+                        }}
+                      />
+                      <Label htmlFor={`revenue-${range}`} className="text-sm cursor-pointer">
+                        {range}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
