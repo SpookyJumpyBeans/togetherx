@@ -6,10 +6,11 @@ import { ContactDialog } from "@/components/ContactDialog";
 import { Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { DbProductCardWithPin, DbProduct } from "@/components/DbProductCardWithPin";
 import { DbProductDetailDialog } from "@/components/DbProductDetailDialog";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,9 +23,9 @@ const Index = () => {
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
   const [contactDialogOpen, setContactDialogOpen] = useState(false);
   const [dateFilter, setDateFilter] = useState<string>("all");
-  const [displayCount, setDisplayCount] = useState(12);
+  const [currentPage, setCurrentPage] = useState(1);
   const [approvedProducts, setApprovedProducts] = useState<any[]>([]);
-  const observerTarget = useRef(null);
+  const PRODUCTS_PER_PAGE = 12;
 
   // Listen for custom event to reopen submit dialog after auth
   useEffect(() => {
@@ -49,8 +50,7 @@ const Index = () => {
         .from('products')
         .select('*,user_id')
         .eq('approval_status','approved')
-        .order('created_at', { ascending: false })
-        .limit(8);
+        .order('created_at', { ascending: false });
       
       if (error) {
         console.error('Error loading approved products:', error);
@@ -98,39 +98,16 @@ const Index = () => {
     });
   }, [approvedProducts, searchQuery, categoryFilter, audienceFilter, userFilter]);
 
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+
   const displayedProducts = useMemo(() => {
-    return filteredProducts.slice(0, displayCount);
-  }, [filteredProducts, displayCount]);
-
-  const loadMore = useCallback(() => {
-    if (displayCount < filteredProducts.length) {
-      setDisplayCount(prev => Math.min(prev + 12, filteredProducts.length));
-    }
-  }, [displayCount, filteredProducts.length]);
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    const endIndex = startIndex + PRODUCTS_PER_PAGE;
+    return filteredProducts.slice(startIndex, endIndex);
+  }, [filteredProducts, currentPage]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
-    return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current);
-      }
-    };
-  }, [loadMore]);
-
-  useEffect(() => {
-    setDisplayCount(12);
+    setCurrentPage(1);
   }, [searchQuery, categoryFilter, audienceFilter, userFilter]);
 
   const handleDbProductClick = (product: DbProduct) => {
@@ -248,9 +225,37 @@ const Index = () => {
             </div>
           )}
 
-          {displayedProducts.length < filteredProducts.length && (
-            <div ref={observerTarget} className="h-20 flex items-center justify-center mt-8">
-              <div className="animate-pulse text-muted-foreground">Loading more...</div>
+          {totalPages > 1 && (
+            <div className="mt-12">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </div>
