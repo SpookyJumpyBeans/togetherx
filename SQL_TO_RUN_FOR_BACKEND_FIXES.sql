@@ -119,3 +119,10 @@ grant execute on function public.get_monthly_contact_counts(timestamptz) to anon
 
 -- Refresh API cache so the RPC becomes available immediately
 select pg_notify('pgrst','reload schema');
+
+-- 4) Add show_on_leaderboard column to products table
+alter table public.products 
+add column if not exists show_on_leaderboard boolean default false;
+
+-- Refresh API cache
+select pg_notify('pgrst','reload schema');

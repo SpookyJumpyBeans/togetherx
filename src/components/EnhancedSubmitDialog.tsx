@@ -7,9 +7,20 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TagSelector } from "@/components/ui/tag-selector";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
+import { 
+  TARGET_AUDIENCE_SUGGESTIONS, 
+  CATEGORY_SUGGESTIONS, 
+  KEYWORD_SUGGESTIONS, 
+  TECH_HIGHLIGHTS_SUGGESTIONS,
+  USER_RANGES,
+  REVENUE_RANGES,
+  GROWTH_RATE_RANGES
+} from "@/data/tagSuggestions";
 
 interface EnhancedSubmitDialogProps {
   open: boolean;
@@ -27,12 +38,12 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     logo: null as File | null,
     logoPreview: "",
     description: "",
-    targetAudience: "",
-    category: "",
+    targetAudience: [] as string[],
+    category: [] as string[],
     contactEmail: "",
-    tags: "",
+    tags: [] as string[],
     usesAI: false,
-    techHighlights: "",
+    techHighlights: [] as string[],
     users: "",
     revenue: "",
     growthRate: "",
@@ -228,14 +239,15 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
           contact_email: formData.contactEmail,
           screenshot_url: screenshotUrl,
           logo_url: logoUrl,
-          target_audience: formData.targetAudience || null,
-          category: formData.category || null,
-          tags: formData.tags || null,
+          target_audience: formData.targetAudience.length > 0 ? formData.targetAudience.join(', ') : null,
+          category: formData.category.length > 0 ? formData.category.join(', ') : null,
+          tags: formData.tags.length > 0 ? formData.tags.join(', ') : null,
           uses_ai: formData.usesAI,
-          tech_highlights: formData.techHighlights || null,
+          tech_highlights: formData.techHighlights.length > 0 ? formData.techHighlights.join(', ') : null,
           users: formData.users || null,
           revenue: formData.revenue || null,
           growth_rate: formData.growthRate || null,
+          show_on_leaderboard: formData.showOnLeaderboard,
           partnership: formData.partnership,
           co_marketing: formData.coMarketing,
           white_label: formData.whiteLabel,
@@ -258,12 +270,12 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
         logo: null,
         logoPreview: "",
         description: "",
-        targetAudience: "",
-        category: "",
+        targetAudience: [],
+        category: [],
         contactEmail: "",
-        tags: "",
+        tags: [],
         usesAI: false,
-        techHighlights: "",
+        techHighlights: [],
         users: "",
         revenue: "",
         growthRate: "",
@@ -419,52 +431,47 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
             {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
           </div>
 
-          {/* Target Audience and Category */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="targetAudience" className="text-base">Target Audience</Label>
-              <Input
-                id="targetAudience"
-                value={formData.targetAudience}
-                onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
-                placeholder="B2B SaaS, B2C, etc."
-                className="h-12 bg-muted/30 border-0"
-              />
-            </div>
+          {/* Target Audience */}
+          <div className="space-y-2">
+            <Label className="text-base">Target Audience</Label>
+            <TagSelector
+              value={formData.targetAudience}
+              onChange={(tags) => setFormData({ ...formData, targetAudience: tags })}
+              suggestions={TARGET_AUDIENCE_SUGGESTIONS}
+              placeholder="Search or add custom audience..."
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category" className="text-base">Category/Vertical</Label>
-              <Input
-                id="category"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                placeholder="MarTech, EdTech, etc."
-                className="h-12 bg-muted/30 border-0"
-              />
-            </div>
+          {/* Category/Vertical */}
+          <div className="space-y-2">
+            <Label className="text-base">Category/Vertical</Label>
+            <TagSelector
+              value={formData.category}
+              onChange={(tags) => setFormData({ ...formData, category: tags })}
+              suggestions={CATEGORY_SUGGESTIONS}
+              placeholder="Search or add custom category..."
+            />
           </div>
 
           {/* Keywords/Tags */}
           <div className="space-y-2">
-            <Label htmlFor="tags" className="text-base">Keywords/Tags</Label>
-            <Input
-              id="tags"
+            <Label className="text-base">Keywords/Tags</Label>
+            <TagSelector
               value={formData.tags}
-              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-              placeholder="AI, SaaS, Automation (comma-separated)"
-              className="h-12 bg-muted/30 border-0"
+              onChange={(tags) => setFormData({ ...formData, tags: tags })}
+              suggestions={KEYWORD_SUGGESTIONS}
+              placeholder="Search or add custom keywords..."
             />
           </div>
 
           {/* Technology Highlights */}
           <div className="space-y-2">
-            <Label htmlFor="techHighlights" className="text-base">Technology Highlights</Label>
-            <Input
-              id="techHighlights"
+            <Label className="text-base">Technology Highlights</Label>
+            <TagSelector
               value={formData.techHighlights}
-              onChange={(e) => setFormData({ ...formData, techHighlights: e.target.value })}
-              placeholder="React, Node.js, OpenAI API (comma-separated)"
-              className="h-12 bg-muted/30 border-0"
+              onChange={(tags) => setFormData({ ...formData, techHighlights: tags })}
+              suggestions={TECH_HIGHLIGHTS_SUGGESTIONS}
+              placeholder="Search or add custom technologies..."
             />
           </div>
 
@@ -491,13 +498,21 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
               {/* Users */}
               <div className="space-y-2">
                 <Label htmlFor="users" className="text-base">Users/DAU/MAU</Label>
-                <Input
-                  id="users"
+                <Select
                   value={formData.users}
-                  onChange={(e) => setFormData({ ...formData, users: e.target.value })}
-                  placeholder="10k+ users"
-                  className="h-12 bg-muted/30 border-0"
-                />
+                  onValueChange={(value) => setFormData({ ...formData, users: value })}
+                >
+                  <SelectTrigger className="h-12 bg-muted/30 border-0">
+                    <SelectValue placeholder="Select range..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover">
+                    {USER_RANGES.map((range) => (
+                      <SelectItem key={range} value={range}>
+                        {range}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <input
                   type="file"
                   accept="image/*"
@@ -516,13 +531,21 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
               {/* Revenue */}
               <div className="space-y-2">
                 <Label htmlFor="revenue" className="text-base">Revenue Range</Label>
-                <Input
-                  id="revenue"
+                <Select
                   value={formData.revenue}
-                  onChange={(e) => setFormData({ ...formData, revenue: e.target.value })}
-                  placeholder="$50k MRR"
-                  className="h-12 bg-muted/30 border-0"
-                />
+                  onValueChange={(value) => setFormData({ ...formData, revenue: value })}
+                >
+                  <SelectTrigger className="h-12 bg-muted/30 border-0">
+                    <SelectValue placeholder="Select range..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover">
+                    {REVENUE_RANGES.map((range) => (
+                      <SelectItem key={range} value={range}>
+                        {range}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <input
                   type="file"
                   accept="image/*"
@@ -541,13 +564,21 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
               {/* Growth Rate */}
               <div className="space-y-2">
                 <Label htmlFor="growthRate" className="text-base">Growth Rate</Label>
-                <Input
-                  id="growthRate"
+                <Select
                   value={formData.growthRate}
-                  onChange={(e) => setFormData({ ...formData, growthRate: e.target.value })}
-                  placeholder="+120% MoM"
-                  className="h-12 bg-muted/30 border-0"
-                />
+                  onValueChange={(value) => setFormData({ ...formData, growthRate: value })}
+                >
+                  <SelectTrigger className="h-12 bg-muted/30 border-0">
+                    <SelectValue placeholder="Select range..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover">
+                    {GROWTH_RATE_RANGES.map((range) => (
+                      <SelectItem key={range} value={range}>
+                        {range}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <input
                   type="file"
                   accept="image/*"

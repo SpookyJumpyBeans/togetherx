@@ -65,6 +65,7 @@ export const TractionLeaderboard = () => {
         .from('products')
         .select('id, name, category, logo_url')
         .eq('approval_status', 'approved')
+        .eq('show_on_leaderboard', true)
         .in('id', productIds);
 
       if (productsError) {
