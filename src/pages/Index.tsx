@@ -105,62 +105,20 @@ const Index = () => {
         );
       })();
       
-      // User filter - supports multiple ranges
+      // User filter - exact match against user ranges
       const matchesUsers = (() => {
         if (userFilter.length === 0) return true;
         if (!product.users) return false;
         
-        // Parse user count - handle k (thousand) and m (million) abbreviations
-        const userStr = product.users.toString().toLowerCase().trim();
-        let users = 0;
-        
-        if (userStr.includes('m')) {
-          users = parseFloat(userStr.replace(/[^0-9.]/g, '')) * 1000000;
-        } else if (userStr.includes('k')) {
-          users = parseFloat(userStr.replace(/[^0-9.]/g, '')) * 1000;
-        } else {
-          users = parseFloat(userStr.replace(/[^0-9.]/g, ''));
-        }
-        
-        return userFilter.some(range => {
-          if (range === "0-100") return users >= 0 && users <= 100;
-          if (range === "100-1,000") return users > 100 && users <= 1000;
-          if (range === "1,000-10,000") return users > 1000 && users <= 10000;
-          if (range === "10,000-100,000") return users > 10000 && users <= 100000;
-          if (range === "100,000-1M") return users > 100000 && users <= 1000000;
-          if (range === "1M-10M") return users > 1000000 && users <= 10000000;
-          if (range === "10M+") return users > 10000000;
-          return false;
-        });
+        return userFilter.includes(product.users.toString());
       })();
 
-      // Revenue filter - supports multiple ranges
+      // Revenue filter - exact match against revenue ranges
       const matchesRevenue = (() => {
         if (revenueFilter.length === 0) return true;
         if (!product.revenue) return false;
         
-        // Extract numeric value from revenue string - handle k (thousand) and m (million)
-        const revenueStr = product.revenue.toString().toLowerCase().trim();
-        let revenueValue = 0;
-        
-        if (revenueStr.includes('m')) {
-          revenueValue = parseFloat(revenueStr.replace(/[^0-9.]/g, '')) * 1000000;
-        } else if (revenueStr.includes('k')) {
-          revenueValue = parseFloat(revenueStr.replace(/[^0-9.]/g, '')) * 1000;
-        } else {
-          revenueValue = parseFloat(revenueStr.replace(/[^0-9.]/g, ''));
-        }
-        
-        return revenueFilter.some(range => {
-          if (range === "$0-$1k MRR") return revenueValue >= 0 && revenueValue < 1000;
-          if (range === "$1k-$10k MRR") return revenueValue >= 1000 && revenueValue < 10000;
-          if (range === "$10k-$50k MRR") return revenueValue >= 10000 && revenueValue < 50000;
-          if (range === "$50k-$100k MRR") return revenueValue >= 50000 && revenueValue < 100000;
-          if (range === "$100k-$500k MRR") return revenueValue >= 100000 && revenueValue < 500000;
-          if (range === "$500k-$1M MRR") return revenueValue >= 500000 && revenueValue < 1000000;
-          if (range === "$1M+ MRR") return revenueValue >= 1000000;
-          return false;
-        });
+        return revenueFilter.includes(product.revenue.toString());
       })();
 
       // Date filter - filters by created_at timestamp
