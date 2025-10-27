@@ -241,7 +241,7 @@ const Index = () => {
         <section id="approved-products" className="container mx-auto px-6 md:px-8 pb-12">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-2xl font-semibold mb-4">Approved Products</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
               {approvedProducts.map((p) => (
                 <DbProductCardWithPin
                   key={p.id}
@@ -257,7 +257,7 @@ const Index = () => {
       {/* Products Grid (demo/mock) */}
       <section id="products" className="container mx-auto px-6 md:px-8 pb-20 flex-1">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
             {displayedProducts.map((product) => (
               <ProductCardWithPin
                 key={product.id}
