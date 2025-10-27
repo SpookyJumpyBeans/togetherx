@@ -54,7 +54,7 @@ const Index = () => {
     (async () => {
       const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select('*,user_id')
         .eq('approval_status','approved')
         .order('created_at', { ascending: false })
         .limit(8);

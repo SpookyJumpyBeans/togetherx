@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 export interface DbProduct {
   id: string;
+  user_id?: string;
   name: string;
   description?: string;
   website_link?: string;
@@ -57,10 +58,16 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
 
     if (!product) return;
 
+    // Don't allow product owner to contact their own product
+    if (product.user_id && user.id === product.user_id) {
+      toast.error("You cannot contact your own product");
+      return;
+    }
+
     setContacting(true);
 
     try {
-      // Track the contact in the database
+      // Track the contact in the database (only non-owner contacts count)
       const { error } = await supabase
         .from('product_contacts')
         .insert([{
