@@ -175,6 +175,19 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
           website_link: formData.websiteLink,
           description: formData.description,
           contact_email: formData.contactEmail,
+          target_audience: formData.targetAudience || null,
+          category: formData.category || null,
+          tags: formData.tags || null,
+          uses_ai: formData.usesAI,
+          tech_highlights: formData.techHighlights || null,
+          users: formData.users || null,
+          revenue: formData.revenue || null,
+          growth_rate: formData.growthRate || null,
+          partnership: formData.partnership,
+          co_marketing: formData.coMarketing,
+          white_label: formData.whiteLabel,
+          reseller: formData.reseller,
+          acquisition: formData.acquisition,
         }]);
 
       if (insertError) throw insertError;

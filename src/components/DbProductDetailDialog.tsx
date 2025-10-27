@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Mail, Globe, Calendar } from "lucide-react";
@@ -103,6 +103,10 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto border-0 shadow-2xl">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Product Details</DialogTitle>
+          <DialogDescription>View product information and contact the founder</DialogDescription>
+        </DialogHeader>
         <div className="space-y-8 py-6">
           {/* Screenshot */}
           <div className="w-full h-64 bg-muted rounded-xl overflow-hidden">
