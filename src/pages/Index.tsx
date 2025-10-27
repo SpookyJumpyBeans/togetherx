@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { ContactDialog } from "@/components/ContactDialog";
+import { ParticleBackground } from "@/components/ParticleBackground";
 import { Sparkles, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -177,8 +178,9 @@ const Index = () => {
       />
       
       {/* Hero Section */}
-      <section className="bg-muted/30 py-20 md:py-32">
-        <div className="container mx-auto px-6 md:px-8">
+      <section className="bg-muted/30 py-20 md:py-32 relative overflow-hidden">
+        <ParticleBackground />
+        <div className="container mx-auto px-6 md:px-8 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background border border-border text-sm">
               <Sparkles className="w-4 h-4" />
