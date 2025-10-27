@@ -171,3 +171,42 @@ using (
 
 -- Refresh API cache
 select pg_notify('pgrst','reload schema');
+
+-- 10) Create success_stories table
+create table if not exists public.success_stories (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  title text not null,
+  story text not null,
+  screenshot text,
+  created_at timestamptz default now() not null,
+  approved boolean default false
+);
+
+-- Enable RLS
+alter table public.success_stories enable row level security;
+
+-- RLS Policies for success_stories
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'success_stories' and policyname = 'Users can view approved stories'
+  ) then
+    create policy "Users can view approved stories" on public.success_stories
+      for select using (approved = true);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'success_stories' and policyname = 'Users can view their own stories'
+  ) then
+    create policy "Users can view their own stories" on public.success_stories
+      for select to authenticated using (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'success_stories' and policyname = 'Authenticated users can insert stories'
+  ) then
+    create policy "Authenticated users can insert stories" on public.success_stories
+      for insert to authenticated with check (auth.uid() = user_id);
+  end if;
+end $$;
+
+-- Refresh API cache
+select pg_notify('pgrst','reload schema');
