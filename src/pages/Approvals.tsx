@@ -152,13 +152,26 @@ export default function Approvals() {
                 <p className="text-muted-foreground text-lg">No pending products</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 {pendingProducts.map((product) => (
-                  <div key={product.id}>
-                    <Card className="overflow-hidden">
-                      <CardHeader>
-                        <CardTitle className="flex items-center justify-between">
-                          {product.name}
+                  <Card key={product.id} className="overflow-hidden">
+                    <div className="grid md:grid-cols-[300px_1fr] gap-6">
+                      <div className="h-48 md:h-full bg-muted">
+                        <img
+                          src={product.screenshot_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop"}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="p-6 space-y-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <CardTitle className="text-2xl mb-2 flex items-center gap-2">
+                              {product.name}
+                              {product.uses_ai && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">AI</span>}
+                            </CardTitle>
+                            <CardDescription>{product.contact_email || "No email"}</CardDescription>
+                          </div>
                           {product.website_link && (
                             <a 
                               href={product.website_link} 
@@ -166,15 +179,41 @@ export default function Approvals() {
                               rel="noopener noreferrer"
                               className="text-primary hover:text-primary/80"
                             >
-                              <ExternalLink className="w-4 h-4" />
+                              <ExternalLink className="w-5 h-5" />
                             </a>
                           )}
-                        </CardTitle>
-                        <CardDescription>{product.contact_email}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
-                        <div className="flex gap-2">
+                        </div>
+
+                        <p className="text-sm text-muted-foreground">{product.description || "No description"}</p>
+
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="font-semibold">Category:</span> {product.category || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Audience:</span> {product.target_audience || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Users:</span> {product.users || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Revenue:</span> {product.revenue || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Growth:</span> {product.growth_rate || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Tech:</span> {product.tech_highlights || "N/A"}
+                          </div>
+                        </div>
+
+                        {product.tags && (
+                          <div className="text-sm">
+                            <span className="font-semibold">Tags:</span> {product.tags}
+                          </div>
+                        )}
+
+                        <div className="flex gap-2 pt-4">
                           <Button
                             onClick={() => handleApprove(product.id)}
                             className="flex-1 bg-success hover:bg-success/90"
@@ -191,9 +230,9 @@ export default function Approvals() {
                             Reject
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                      </div>
+                    </div>
+                  </Card>
                 ))}
               </div>
             )}
@@ -206,28 +245,68 @@ export default function Approvals() {
                 <p className="text-muted-foreground text-lg">No approved products</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 {approvedProducts.map((product) => (
                   <Card key={product.id} className="overflow-hidden">
-                    <CardHeader>
-                      <CardTitle className="flex items-center justify-between">
-                        {product.name}
-                        {product.website_link && (
-                          <a 
-                            href={product.website_link} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-primary hover:text-primary/80"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
+                    <div className="grid md:grid-cols-[300px_1fr] gap-6">
+                      <div className="h-48 md:h-full bg-muted">
+                        <img
+                          src={product.screenshot_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop"}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="p-6 space-y-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <CardTitle className="text-2xl mb-2 flex items-center gap-2">
+                              {product.name}
+                              {product.uses_ai && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">AI</span>}
+                            </CardTitle>
+                            <CardDescription>{product.contact_email || "No email"}</CardDescription>
+                          </div>
+                          {product.website_link && (
+                            <a 
+                              href={product.website_link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-primary hover:text-primary/80"
+                            >
+                              <ExternalLink className="w-5 h-5" />
+                            </a>
+                          )}
+                        </div>
+
+                        <p className="text-sm text-muted-foreground">{product.description || "No description"}</p>
+
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="font-semibold">Category:</span> {product.category || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Audience:</span> {product.target_audience || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Users:</span> {product.users || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Revenue:</span> {product.revenue || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Growth:</span> {product.growth_rate || "N/A"}
+                          </div>
+                          <div>
+                            <span className="font-semibold">Tech:</span> {product.tech_highlights || "N/A"}
+                          </div>
+                        </div>
+
+                        {product.tags && (
+                          <div className="text-sm">
+                            <span className="font-semibold">Tags:</span> {product.tags}
+                          </div>
                         )}
-                      </CardTitle>
-                      <CardDescription>{product.contact_email}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">{product.description}</p>
-                    </CardContent>
+                      </div>
+                    </div>
                   </Card>
                 ))}
               </div>

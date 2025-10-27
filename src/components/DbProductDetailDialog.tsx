@@ -13,6 +13,20 @@ export interface DbProduct {
   website_link?: string;
   contact_email?: string;
   created_at?: string;
+  screenshot_url?: string;
+  target_audience?: string;
+  category?: string;
+  tags?: string;
+  uses_ai?: boolean;
+  tech_highlights?: string;
+  users?: string;
+  revenue?: string;
+  growth_rate?: string;
+  partnership?: boolean;
+  co_marketing?: boolean;
+  white_label?: boolean;
+  reseller?: boolean;
+  acquisition?: boolean;
 }
 
 interface DbProductDetailDialogProps {
@@ -78,27 +92,110 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
 
   if (!product) return null;
 
+  const partnershipTypes = [
+    { key: 'partnership', label: 'General Partnership', value: product?.partnership },
+    { key: 'co_marketing', label: 'Co-marketing', value: product?.co_marketing },
+    { key: 'white_label', label: 'White Label', value: product?.white_label },
+    { key: 'reseller', label: 'Reseller', value: product?.reseller },
+    { key: 'acquisition', label: 'Acquisition', value: product?.acquisition },
+  ].filter(type => type.value);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto border-0 shadow-2xl">
         <div className="space-y-8 py-6">
+          {/* Screenshot */}
+          <div className="w-full h-64 bg-muted rounded-xl overflow-hidden">
+            <img
+              src={product?.screenshot_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop"}
+              alt={product?.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
           {/* Header */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-3xl font-bold">{product.name}</h2>
+              <h2 className="text-3xl font-bold">{product?.name}</h2>
+              {product?.uses_ai && (
+                <Badge variant="secondary">Uses AI</Badge>
+              )}
             </div>
 
-            {product.description && (
-              <p className="text-muted-foreground leading-relaxed text-base">
-                {product.description}
-              </p>
-            )}
+            <p className="text-muted-foreground leading-relaxed text-base">
+              {product?.description || "No description provided"}
+            </p>
           </div>
 
-          {/* Website Link */}
-          {product.website_link && (
+          {/* Basic Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-muted-foreground">Category</h3>
+              <p>{product?.category || "Not specified"}</p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-muted-foreground">Target Audience</h3>
+              <p>{product?.target_audience || "Not specified"}</p>
+            </div>
+          </div>
+
+          {/* Tags */}
+          {product?.tags && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-muted-foreground">Tags</h3>
+              <div className="flex flex-wrap gap-2">
+                {product.tags.split(',').map((tag, i) => (
+                  <Badge key={i} variant="outline">{tag.trim()}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Tech Highlights */}
+          {product?.tech_highlights && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-muted-foreground">Technology Stack</h3>
+              <p className="text-sm">{product.tech_highlights}</p>
+            </div>
+          )}
+
+          {/* Traction Metrics */}
+          {(product?.users || product?.revenue || product?.growth_rate) && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Website</h3>
+              <h3 className="text-lg font-semibold">Traction</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Users/DAU/MAU</p>
+                  <p className="font-medium">{product.users || "Not disclosed"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Revenue</p>
+                  <p className="font-medium">{product.revenue || "Not disclosed"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Growth Rate</p>
+                  <p className="font-medium">{product.growth_rate || "Not disclosed"}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Partnership Types */}
+          {partnershipTypes.length > 0 && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-muted-foreground">Partnership Interests</h3>
+              <div className="flex flex-wrap gap-2">
+                {partnershipTypes.map((type) => (
+                  <Badge key={type.key}>{type.label}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Website Link */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-muted-foreground">Website</h3>
+            {product?.website_link ? (
               <a
                 href={product.website_link}
                 target="_blank"
@@ -108,11 +205,13 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
                 <Globe className="w-4 h-4" />
                 {product.website_link}
               </a>
-            </div>
-          )}
+            ) : (
+              <p className="text-muted-foreground">Not provided</p>
+            )}
+          </div>
 
           {/* Created Date */}
-          {product.created_at && (
+          {product?.created_at && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="w-4 h-4" />
               Listed on {new Date(product.created_at).toLocaleDateString()}
