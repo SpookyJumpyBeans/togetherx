@@ -56,6 +56,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     whiteLabel: false,
     reseller: false,
     acquisition: false,
+    acquisitionDetails: "",
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -253,6 +254,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
           white_label: formData.whiteLabel,
           reseller: formData.reseller,
           acquisition: formData.acquisition,
+          acquisition_details: formData.acquisitionDetails || null,
         }]);
 
       if (insertError) throw insertError;
@@ -288,6 +290,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
         whiteLabel: false,
         reseller: false,
         acquisition: false,
+        acquisitionDetails: "",
       });
     } catch (error: any) {
       toast.error("Failed to submit product: " + error.message);
@@ -660,6 +663,21 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
                 </label>
               ))}
             </div>
+
+            {/* Acquisition Details */}
+            {formData.acquisition && (
+              <div className="space-y-2 pt-2">
+                <Label htmlFor="acquisitionDetails" className="text-base">Acquisition Details</Label>
+                <Textarea
+                  id="acquisitionDetails"
+                  value={formData.acquisitionDetails}
+                  onChange={(e) => setFormData({ ...formData, acquisitionDetails: e.target.value })}
+                  placeholder="Provide details about your acquisition preferences, timeline, and expectations..."
+                  rows={3}
+                  className="bg-muted/30 border-0 resize-none"
+                />
+              </div>
+            )}
           </div>
 
           <Button

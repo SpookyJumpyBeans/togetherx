@@ -130,5 +130,9 @@ alter column users type text using users::text,
 alter column revenue type text using revenue::text,
 alter column growth_rate type text using growth_rate::text;
 
+-- 6) Add acquisition_details column
+alter table public.products 
+add column if not exists acquisition_details text;
+
 -- Refresh API cache
 select pg_notify('pgrst','reload schema');
