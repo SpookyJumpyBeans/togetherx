@@ -178,7 +178,8 @@ const Index = () => {
       />
       
       {/* Hero Section */}
-      <section className="bg-muted/30 py-20 md:py-32 relative overflow-hidden">
+      <section className="relative py-20 md:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/40 to-background" />
         <ParticleBackground />
         <div className="container mx-auto px-6 md:px-8 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-6">
