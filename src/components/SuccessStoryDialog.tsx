@@ -85,6 +85,13 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
 
         if (error) throw error;
         toast.success("Success story updated!");
+        
+        // Reset form and close dialog
+        setFormData({ title: "", story: "", screenshot: null });
+        onOpenChange(false);
+        
+        // Call onSuccess to reload data
+        onSuccess?.();
       } else {
         // Insert new story
         const { error } = await supabase
@@ -98,11 +105,14 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
 
         if (error) throw error;
         toast.success("Success story added!");
+        
+        // Reset form and close dialog
+        setFormData({ title: "", story: "", screenshot: null });
+        onOpenChange(false);
+        
+        // Call onSuccess to reload data
+        onSuccess?.();
       }
-
-      setFormData({ title: "", story: "", screenshot: null });
-      onSuccess?.();
-      onOpenChange(false);
     } catch (error: any) {
       toast.error(editingStory ? "Failed to update story" : "Failed to add story", { 
         description: error.message 
