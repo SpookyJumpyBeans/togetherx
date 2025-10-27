@@ -183,6 +183,41 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     setLoading(true);
 
     try {
+      let screenshotUrl = null;
+      let logoUrl = null;
+
+      // Upload screenshot if provided
+      if (formData.screenshot) {
+        const screenshotExt = formData.screenshot.name.split('.').pop();
+        const screenshotPath = `${user.id}/${Date.now()}-screenshot.${screenshotExt}`;
+        const { error: screenshotUploadError } = await supabase.storage
+          .from('product-images')
+          .upload(screenshotPath, formData.screenshot);
+        
+        if (!screenshotUploadError) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-images')
+            .getPublicUrl(screenshotPath);
+          screenshotUrl = publicUrl;
+        }
+      }
+
+      // Upload logo if provided
+      if (formData.logo) {
+        const logoExt = formData.logo.name.split('.').pop();
+        const logoPath = `${user.id}/${Date.now()}-logo.${logoExt}`;
+        const { error: logoUploadError } = await supabase.storage
+          .from('product-images')
+          .upload(logoPath, formData.logo);
+        
+        if (!logoUploadError) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-images')
+            .getPublicUrl(logoPath);
+          logoUrl = publicUrl;
+        }
+      }
+
       const { error: insertError } = await supabase
         .from('products')
         .insert([{
@@ -191,6 +226,8 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
           website_link: formData.websiteLink,
           description: formData.description,
           contact_email: formData.contactEmail,
+          screenshot_url: screenshotUrl,
+          logo_url: logoUrl,
           target_audience: formData.targetAudience || null,
           category: formData.category || null,
           tags: formData.tags || null,

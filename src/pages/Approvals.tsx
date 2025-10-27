@@ -196,32 +196,66 @@ export default function Approvals() {
 
                         <p className="text-sm text-muted-foreground">{product.description || "No description"}</p>
 
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="font-semibold">Category:</span> {product.category || "N/A"}
+                        <div className="space-y-4 pt-2 border-t">
+                          {/* Basic Info */}
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="font-semibold">Category:</span> {product.category || "N/A"}
+                            </div>
+                            <div>
+                              <span className="font-semibold">Audience:</span> {product.target_audience || "N/A"}
+                            </div>
                           </div>
-                          <div>
-                            <span className="font-semibold">Audience:</span> {product.target_audience || "N/A"}
-                          </div>
-                          <div>
-                            <span className="font-semibold">Users:</span> {product.users || "N/A"}
-                          </div>
-                          <div>
-                            <span className="font-semibold">Revenue:</span> {product.revenue || "N/A"}
-                          </div>
-                          <div>
-                            <span className="font-semibold">Growth:</span> {product.growth_rate || "N/A"}
-                          </div>
-                          <div>
-                            <span className="font-semibold">Tech:</span> {product.tech_highlights || "N/A"}
-                          </div>
-                        </div>
 
-                        {product.tags && (
-                          <div className="text-sm">
-                            <span className="font-semibold">Tags:</span> {product.tags}
-                          </div>
-                        )}
+                          {/* Technology Highlights */}
+                          {product.tech_highlights && (
+                            <div className="text-sm">
+                              <span className="font-semibold block mb-1">Technology Highlights:</span>
+                              <p className="text-muted-foreground">{product.tech_highlights}</p>
+                            </div>
+                          )}
+
+                          {/* Traction Metrics */}
+                          {(product.users || product.revenue || product.growth_rate) && (
+                            <div>
+                              <span className="font-semibold block mb-2 text-sm">Traction Metrics:</span>
+                              <div className="grid grid-cols-3 gap-4 text-sm">
+                                <div>
+                                  <span className="text-xs text-muted-foreground block">Total Users</span>
+                                  <span className="font-medium">{product.users || "N/A"}</span>
+                                </div>
+                                <div>
+                                  <span className="text-xs text-muted-foreground block">Monthly Active</span>
+                                  <span className="font-medium">{product.growth_rate || "N/A"}</span>
+                                </div>
+                                <div>
+                                  <span className="text-xs text-muted-foreground block">Revenue</span>
+                                  <span className="font-medium">{product.revenue || "N/A"}</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Partnership Opportunities */}
+                          {(product.partnership || product.co_marketing || product.white_label || product.reseller || product.acquisition) && (
+                            <div className="text-sm">
+                              <span className="font-semibold block mb-2">Partnership Opportunities:</span>
+                              <div className="flex flex-wrap gap-2">
+                                {product.partnership && <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">General Partnership</span>}
+                                {product.co_marketing && <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">Co-marketing</span>}
+                                {product.white_label && <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">White Label</span>}
+                                {product.reseller && <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">Reseller</span>}
+                                {product.acquisition && <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">Acquisition</span>}
+                              </div>
+                            </div>
+                          )}
+
+                          {product.tags && (
+                            <div className="text-sm">
+                              <span className="font-semibold">Tags:</span> {product.tags}
+                            </div>
+                          )}
+                        </div>
 
                         <div className="flex gap-2 pt-4">
                           <Button
@@ -299,32 +333,66 @@ export default function Approvals() {
 
                         <p className="text-sm text-muted-foreground">{product.description || "No description"}</p>
 
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="font-semibold">Category:</span> {product.category || "N/A"}
+                        <div className="space-y-4 pt-2 border-t">
+                          {/* Basic Info */}
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="font-semibold">Category:</span> {product.category || "N/A"}
+                            </div>
+                            <div>
+                              <span className="font-semibold">Audience:</span> {product.target_audience || "N/A"}
+                            </div>
                           </div>
-                          <div>
-                            <span className="font-semibold">Audience:</span> {product.target_audience || "N/A"}
-                          </div>
-                          <div>
-                            <span className="font-semibold">Users:</span> {product.users || "N/A"}
-                          </div>
-                          <div>
-                            <span className="font-semibold">Revenue:</span> {product.revenue || "N/A"}
-                          </div>
-                          <div>
-                            <span className="font-semibold">Growth:</span> {product.growth_rate || "N/A"}
-                          </div>
-                          <div>
-                            <span className="font-semibold">Tech:</span> {product.tech_highlights || "N/A"}
-                          </div>
-                        </div>
 
-                        {product.tags && (
-                          <div className="text-sm">
-                            <span className="font-semibold">Tags:</span> {product.tags}
-                          </div>
-                        )}
+                          {/* Technology Highlights */}
+                          {product.tech_highlights && (
+                            <div className="text-sm">
+                              <span className="font-semibold block mb-1">Technology Highlights:</span>
+                              <p className="text-muted-foreground">{product.tech_highlights}</p>
+                            </div>
+                          )}
+
+                          {/* Traction Metrics */}
+                          {(product.users || product.revenue || product.growth_rate) && (
+                            <div>
+                              <span className="font-semibold block mb-2 text-sm">Traction Metrics:</span>
+                              <div className="grid grid-cols-3 gap-4 text-sm">
+                                <div>
+                                  <span className="text-xs text-muted-foreground block">Total Users</span>
+                                  <span className="font-medium">{product.users || "N/A"}</span>
+                                </div>
+                                <div>
+                                  <span className="text-xs text-muted-foreground block">Monthly Active</span>
+                                  <span className="font-medium">{product.growth_rate || "N/A"}</span>
+                                </div>
+                                <div>
+                                  <span className="text-xs text-muted-foreground block">Revenue</span>
+                                  <span className="font-medium">{product.revenue || "N/A"}</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Partnership Opportunities */}
+                          {(product.partnership || product.co_marketing || product.white_label || product.reseller || product.acquisition) && (
+                            <div className="text-sm">
+                              <span className="font-semibold block mb-2">Partnership Opportunities:</span>
+                              <div className="flex flex-wrap gap-2">
+                                {product.partnership && <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">General Partnership</span>}
+                                {product.co_marketing && <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">Co-marketing</span>}
+                                {product.white_label && <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">White Label</span>}
+                                {product.reseller && <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">Reseller</span>}
+                                {product.acquisition && <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">Acquisition</span>}
+                              </div>
+                            </div>
+                          )}
+
+                          {product.tags && (
+                            <div className="text-sm">
+                              <span className="font-semibold">Tags:</span> {product.tags}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </Card>
