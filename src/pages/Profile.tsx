@@ -170,17 +170,21 @@ export default function Profile() {
   const handleDeleteStory = async (storyId: string) => {
     if (!user) return;
 
-    const { error } = await supabase
-      .from("success_stories")
-      .delete()
-      .eq("id", storyId)
-      .eq("user_id", user.id);
+    try {
+      const { error } = await supabase
+        .from("success_stories")
+        .delete()
+        .eq("id", storyId)
+        .eq("user_id", user.id);
 
-    if (!error) {
+      if (error) throw error;
+      
+      // Update local state immediately
       setSuccessStories(successStories.filter((s) => s.id !== storyId));
       toast.success("Success story deleted");
-    } else {
-      toast.error("Failed to delete story");
+    } catch (error: any) {
+      console.error("Delete story error:", error);
+      toast.error("Failed to delete story: " + error.message);
     }
   };
 
@@ -199,6 +203,16 @@ export default function Profile() {
   const handleStoryClick = (story: any) => {
     setSelectedStory(story);
     setStoryDetailOpen(true);
+  };
+
+  const handleStorySuccess = async () => {
+    // Wait a bit for database to commit
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Reload stories from database
+    if (user) {
+      await loadSuccessStories(user.id);
+    }
   };
 
   if (loading) {
@@ -440,7 +454,7 @@ export default function Profile() {
         open={storyDialogOpen} 
         onOpenChange={handleStoryDialogClose}
         editingStory={editingStory}
-        onSuccess={() => user && loadSuccessStories(user.id)}
+        onSuccess={handleStorySuccess}
       />
       <EnhancedSubmitDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen} />
       <SubscribeDialog open={subscribeDialogOpen} onOpenChange={setSubscribeDialogOpen} />

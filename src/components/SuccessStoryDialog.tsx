@@ -73,7 +73,7 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
 
       if (editingStory) {
         // Update existing story
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('success_stories')
           .update({
             title: formData.title,
@@ -81,39 +81,56 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
             screenshot: screenshotUrl,
           })
           .eq('id', editingStory.id)
-          .eq('user_id', session.user.id);
+          .eq('user_id', session.user.id)
+          .select();
 
-        if (error) throw error;
+        if (error) {
+          console.error("Update error:", error);
+          throw error;
+        }
+        
+        console.log("Update successful:", data);
         toast.success("Success story updated!");
         
-        // Reset form and close dialog
+        // Reset form
         setFormData({ title: "", story: "", screenshot: null });
-        onOpenChange(false);
         
-        // Call onSuccess to reload data
-        onSuccess?.();
+        // Call onSuccess to reload data BEFORE closing dialog
+        await onSuccess?.();
+        
+        // Close dialog after reload
+        onOpenChange(false);
       } else {
         // Insert new story
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('success_stories')
           .insert([{
             user_id: session.user.id,
             title: formData.title,
             story: formData.story,
             screenshot: screenshotUrl,
-          }]);
+          }])
+          .select();
 
-        if (error) throw error;
+        if (error) {
+          console.error("Insert error:", error);
+          throw error;
+        }
+        
+        console.log("Insert successful:", data);
         toast.success("Success story added!");
         
-        // Reset form and close dialog
+        // Reset form
         setFormData({ title: "", story: "", screenshot: null });
-        onOpenChange(false);
         
-        // Call onSuccess to reload data
-        onSuccess?.();
+        // Call onSuccess to reload data BEFORE closing dialog
+        await onSuccess?.();
+        
+        // Close dialog after reload
+        onOpenChange(false);
       }
     } catch (error: any) {
+      console.error("Story save error:", error);
       toast.error(editingStory ? "Failed to update story" : "Failed to add story", { 
         description: error.message 
       });
