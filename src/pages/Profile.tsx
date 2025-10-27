@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DbProductCardWithPin } from "@/components/DbProductCardWithPin";
 import { SuccessStoryDialog } from "@/components/SuccessStoryDialog";
+import { SuccessStoryDetailDialog } from "@/components/SuccessStoryDetailDialog";
 import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +31,8 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [storyDialogOpen, setStoryDialogOpen] = useState(false);
+  const [storyDetailOpen, setStoryDetailOpen] = useState(false);
+  const [selectedStory, setSelectedStory] = useState<any>(null);
   const [editingStory, setEditingStory] = useState<any>(null);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
@@ -193,6 +196,11 @@ export default function Profile() {
     }
   };
 
+  const handleStoryClick = (story: any) => {
+    setSelectedStory(story);
+    setStoryDetailOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -352,7 +360,11 @@ export default function Profile() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {successStories.map((story) => (
-                <Card key={story.id} className="border-border/30 bg-card/50 backdrop-blur-sm">
+                <Card 
+                  key={story.id} 
+                  className="border-border/30 bg-card/50 backdrop-blur-sm cursor-pointer hover:border-primary/50 transition-colors"
+                  onClick={() => handleStoryClick(story)}
+                >
                   <CardContent className="p-6">
                     {story.screenshot && (
                       <img 
@@ -363,7 +375,7 @@ export default function Profile() {
                     )}
                     <h3 className="text-xl font-bold mb-2">{story.title}</h3>
                     <p className="text-muted-foreground mb-4 line-clamp-3">{story.story}</p>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                       <Button
                         variant="outline"
                         size="sm"
@@ -419,6 +431,11 @@ export default function Profile() {
 
       <Footer />
 
+      <SuccessStoryDetailDialog
+        open={storyDetailOpen}
+        onOpenChange={setStoryDetailOpen}
+        story={selectedStory}
+      />
       <SuccessStoryDialog 
         open={storyDialogOpen} 
         onOpenChange={handleStoryDialogClose}

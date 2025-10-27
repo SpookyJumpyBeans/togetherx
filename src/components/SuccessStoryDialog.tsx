@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,14 +22,14 @@ interface SuccessStoryDialogProps {
 
 export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess }: SuccessStoryDialogProps) => {
   const [formData, setFormData] = useState({
-    title: editingStory?.title || "",
-    story: editingStory?.story || "",
+    title: "",
+    story: "",
     screenshot: null as File | null,
   });
   const [loading, setLoading] = useState(false);
 
   // Update form when editingStory changes
-  useState(() => {
+  useEffect(() => {
     if (editingStory) {
       setFormData({
         title: editingStory.title,
@@ -39,7 +39,7 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
     } else {
       setFormData({ title: "", story: "", screenshot: null });
     }
-  });
+  }, [editingStory]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
