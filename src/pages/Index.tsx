@@ -1,17 +1,12 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { ProductCardWithPin } from "@/components/ProductCardWithPin";
-import { mockProducts } from "@/data/mockProducts";
 import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
-import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { ContactDialog } from "@/components/ContactDialog";
 import { Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { Product } from "@/components/ProductCard";
 import { supabase } from "@/lib/supabase";
 import { DbProductCardWithPin, DbProduct } from "@/components/DbProductCardWithPin";
 import { DbProductDetailDialog } from "@/components/DbProductDetailDialog";
@@ -22,9 +17,7 @@ const Index = () => {
   const [audienceFilter, setAudienceFilter] = useState<string>("all");
   const [userFilter, setUserFilter] = useState<string>("all");
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedDbProduct, setSelectedDbProduct] = useState<DbProduct | null>(null);
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [dbDetailDialogOpen, setDbDetailDialogOpen] = useState(false);
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
   const [contactDialogOpen, setContactDialogOpen] = useState(false);
@@ -71,34 +64,39 @@ const Index = () => {
     return () => { mounted = false; };
   }, []);
 
-  const categories = useMemo(() => Array.from(new Set(mockProducts.map((p) => p.category))), []);
-  const audiences = useMemo(() => Array.from(new Set(mockProducts.map((p) => p.targetAudience))), []);
+  const categories = useMemo(() => {
+    return Array.from(new Set(approvedProducts.map(p => p.category).filter(Boolean)));
+  }, [approvedProducts]);
+  
+  const audiences = useMemo(() => {
+    return Array.from(new Set(approvedProducts.map(p => p.target_audience).filter(Boolean)));
+  }, [approvedProducts]);
 
   const filteredProducts = useMemo(() => {
-    return mockProducts
-      .filter((product) => {
-        const matchesSearch =
-          searchQuery === "" ||
-          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return approvedProducts.filter((product) => {
+      const matchesSearch =
+        searchQuery === "" ||
+        product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category?.toLowerCase().includes(searchQuery.toLowerCase());
 
-        const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
-        const matchesAudience = audienceFilter === "all" || product.targetAudience === audienceFilter;
-        
-        const matchesUsers = (() => {
-          if (userFilter === "all") return true;
-          if (!product.traction.users) return false;
-          if (userFilter === "0-1k") return product.traction.users < 1000;
-          if (userFilter === "1k-10k") return product.traction.users >= 1000 && product.traction.users < 10000;
-          if (userFilter === "10k-50k") return product.traction.users >= 10000 && product.traction.users < 50000;
-          if (userFilter === "50k+") return product.traction.users >= 50000;
-          return true;
-        })();
+      const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
+      const matchesAudience = audienceFilter === "all" || product.target_audience === audienceFilter;
+      
+      const matchesUsers = (() => {
+        if (userFilter === "all") return true;
+        if (!product.users) return false;
+        const users = typeof product.users === 'string' ? parseInt(product.users) : product.users;
+        if (userFilter === "0-1k") return users < 1000;
+        if (userFilter === "1k-10k") return users >= 1000 && users < 10000;
+        if (userFilter === "10k-50k") return users >= 10000 && users < 50000;
+        if (userFilter === "50k+") return users >= 50000;
+        return true;
+      })();
 
-        return matchesSearch && matchesCategory && matchesAudience && matchesUsers;
-      });
-  }, [searchQuery, categoryFilter, audienceFilter, userFilter]);
+      return matchesSearch && matchesCategory && matchesAudience && matchesUsers;
+    });
+  }, [approvedProducts, searchQuery, categoryFilter, audienceFilter, userFilter]);
 
   const displayedProducts = useMemo(() => {
     return filteredProducts.slice(0, displayCount);
@@ -134,11 +132,6 @@ const Index = () => {
   useEffect(() => {
     setDisplayCount(12);
   }, [searchQuery, categoryFilter, audienceFilter, userFilter]);
-
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product);
-    setDetailDialogOpen(true);
-  };
 
   const handleDbProductClick = (product: DbProduct) => {
     setSelectedDbProduct(product);
@@ -236,33 +229,15 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Approved Products (live) */}
-      {approvedProducts.length > 0 && (
-        <section id="approved-products" className="container mx-auto px-6 md:px-8 pb-12">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-2xl font-semibold mb-4">Approved Products</h2>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
-              {approvedProducts.map((p) => (
-                <DbProductCardWithPin
-                  key={p.id}
-                  product={p}
-                  onClick={() => handleDbProductClick(p)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Products Grid (demo/mock) */}
+      {/* Products Grid */}
       <section id="products" className="container mx-auto px-6 md:px-8 pb-20 flex-1">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
             {displayedProducts.map((product) => (
-              <ProductCardWithPin
+              <DbProductCardWithPin
                 key={product.id}
                 product={product}
-                onClick={() => handleProductClick(product)}
+                onClick={() => handleDbProductClick(product)}
               />
             ))}
           </div>
@@ -286,11 +261,6 @@ const Index = () => {
       <EnhancedSubmitDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen} />
       <SubscribeDialog open={subscribeDialogOpen} onOpenChange={setSubscribeDialogOpen} />
       <ContactDialog open={contactDialogOpen} onOpenChange={setContactDialogOpen} />
-      <ProductDetailDialog 
-        product={selectedProduct} 
-        open={detailDialogOpen} 
-        onOpenChange={setDetailDialogOpen} 
-      />
       <DbProductDetailDialog
         product={selectedDbProduct}
         open={dbDetailDialogOpen}

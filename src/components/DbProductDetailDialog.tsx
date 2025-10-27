@@ -178,8 +178,17 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
 
           {/* Tech Highlights */}
           {product?.tech_highlights && (
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-muted-foreground">Technology Stack</h3>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                {product?.logo_url && (
+                  <img
+                    src={product.logo_url}
+                    alt={`${product.name} logo`}
+                    className="w-5 h-5 object-contain rounded"
+                  />
+                )}
+                <h3 className="text-sm font-semibold text-muted-foreground">Technology Stack</h3>
+              </div>
               <p className="text-sm">{product.tech_highlights}</p>
             </div>
           )}
@@ -187,7 +196,16 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
           {/* Traction Metrics */}
           {(product?.users || product?.revenue || product?.growth_rate) && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Traction</h3>
+              <div className="flex items-center gap-2">
+                {product?.logo_url && (
+                  <img
+                    src={product.logo_url}
+                    alt={`${product.name} logo`}
+                    className="w-5 h-5 object-contain rounded"
+                  />
+                )}
+                <h3 className="text-lg font-semibold">Traction</h3>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">Users/DAU/MAU</p>
