@@ -154,7 +154,7 @@ export default function Approvals() {
             ) : (
               <div className="grid grid-cols-1 gap-6">
                 {pendingProducts.map((product) => (
-                  <Card key={product.id} className="overflow-hidden">
+                <Card key={product.id} className="overflow-hidden">
                     <div className="grid md:grid-cols-[300px_1fr] gap-6">
                       <div className="h-48 md:h-full bg-muted">
                         <img
@@ -165,12 +165,22 @@ export default function Approvals() {
                       </div>
                       <div className="p-6 space-y-4">
                         <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <CardTitle className="text-2xl mb-2 flex items-center gap-2">
-                              {product.name}
-                              {product.uses_ai && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">AI</span>}
-                            </CardTitle>
-                            <CardDescription>{product.contact_email || "No email"}</CardDescription>
+                          <div className="flex items-start gap-3">
+                            {/* Logo */}
+                            <div className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                              <img
+                                src={product.logo_url || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&h=100&fit=crop"}
+                                alt={`${product.name} logo`}
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                            <div>
+                              <CardTitle className="text-2xl mb-2 flex items-center gap-2">
+                                {product.name}
+                                {product.uses_ai && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">AI</span>}
+                              </CardTitle>
+                              <CardDescription>{product.contact_email || "No email"}</CardDescription>
+                            </div>
                           </div>
                           {product.website_link && (
                             <a 
@@ -258,12 +268,22 @@ export default function Approvals() {
                       </div>
                       <div className="p-6 space-y-4">
                         <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <CardTitle className="text-2xl mb-2 flex items-center gap-2">
-                              {product.name}
-                              {product.uses_ai && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">AI</span>}
-                            </CardTitle>
-                            <CardDescription>{product.contact_email || "No email"}</CardDescription>
+                          <div className="flex items-start gap-3">
+                            {/* Logo */}
+                            <div className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                              <img
+                                src={product.logo_url || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&h=100&fit=crop"}
+                                alt={`${product.name} logo`}
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                            <div>
+                              <CardTitle className="text-2xl mb-2 flex items-center gap-2">
+                                {product.name}
+                                {product.uses_ai && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">AI</span>}
+                              </CardTitle>
+                              <CardDescription>{product.contact_email || "No email"}</CardDescription>
+                            </div>
                           </div>
                           {product.website_link && (
                             <a 

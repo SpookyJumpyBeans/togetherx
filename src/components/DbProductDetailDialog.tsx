@@ -14,6 +14,7 @@ export interface DbProduct {
   contact_email?: string;
   created_at?: string;
   screenshot_url?: string;
+  logo_url?: string;
   target_audience?: string;
   category?: string;
   tags?: string;
@@ -117,18 +118,31 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
             />
           </div>
 
-          {/* Header */}
+          {/* Header with Logo */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-3xl font-bold">{product?.name}</h2>
-              {product?.uses_ai && (
-                <Badge variant="secondary">Uses AI</Badge>
-              )}
-            </div>
+            <div className="flex items-start gap-4">
+              {/* Logo */}
+              <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                <img
+                  src={product?.logo_url || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200&h=200&fit=crop"}
+                  alt={`${product?.name} logo`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 flex-wrap mb-2">
+                  <h2 className="text-3xl font-bold">{product?.name}</h2>
+                  {product?.uses_ai && (
+                    <Badge variant="secondary">Uses AI</Badge>
+                  )}
+                </div>
 
-            <p className="text-muted-foreground leading-relaxed text-base">
-              {product?.description || "No description provided"}
-            </p>
+                <p className="text-muted-foreground leading-relaxed text-base">
+                  {product?.description || "No description provided"}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Basic Info */}

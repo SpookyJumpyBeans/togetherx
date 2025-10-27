@@ -24,6 +24,8 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     websiteLink: "",
     screenshot: null as File | null,
     screenshotPreview: "",
+    logo: null as File | null,
+    logoPreview: "",
     description: "",
     targetAudience: "",
     category: "",
@@ -70,6 +72,8 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
       ...formData,
       screenshot: null,
       screenshotPreview: formData.screenshotPreview,
+      logo: null,
+      logoPreview: formData.logoPreview,
       usersFile: null,
       revenueFile: null,
       growthFile: null,
@@ -101,6 +105,18 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({ ...prev, screenshotPreview: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({ ...formData, logo: file });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, logoPreview: reader.result as string }));
       };
       reader.readAsDataURL(file);
     }
@@ -202,6 +218,8 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
         websiteLink: "",
         screenshot: null,
         screenshotPreview: "",
+        logo: null,
+        logoPreview: "",
         description: "",
         targetAudience: "",
         category: "",
@@ -271,6 +289,41 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
               className={`h-12 bg-muted/30 border-0 ${errors.websiteLink ? 'border-2 border-destructive' : ''}`}
             />
             {errors.websiteLink && <p className="text-sm text-destructive">{errors.websiteLink}</p>}
+          </div>
+
+          {/* Product Logo */}
+          <div className="space-y-2">
+            <Label className="text-base">Product Logo</Label>
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleLogoChange}
+                className="hidden"
+                id="logo-upload"
+              />
+              <label
+                htmlFor="logo-upload"
+                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl hover:border-foreground/20 transition-colors cursor-pointer bg-muted/10"
+              >
+                {formData.logoPreview ? (
+                  <img
+                    src={formData.logoPreview}
+                    alt="Logo Preview"
+                    className="h-full object-contain p-4"
+                  />
+                ) : (
+                  <div className="text-center p-4">
+                    <p className="text-sm font-medium mb-1">
+                      Upload your logo
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      PNG, JPG or SVG
+                    </p>
+                  </div>
+                )}
+              </label>
+            </div>
           </div>
 
           {/* Product Screenshot */}
