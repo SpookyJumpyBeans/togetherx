@@ -134,5 +134,9 @@ alter column growth_rate type text using growth_rate::text;
 alter table public.products 
 add column if not exists acquisition_details text;
 
+-- 7) Add screenshot_urls column for multiple screenshots
+alter table public.products 
+add column if not exists screenshot_urls text[];
+
 -- Refresh API cache
 select pg_notify('pgrst','reload schema');
