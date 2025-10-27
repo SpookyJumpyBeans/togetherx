@@ -123,15 +123,85 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
           </div>
           
           <div className="p-5 flex-1 flex flex-col">
-            {/* Product Name */}
-            <h3 className="font-semibold text-base leading-tight mb-2">
-              {product.name}
-            </h3>
-            
+            {/* Header: Logo + Name */}
+            <div className="flex items-start gap-3 mb-2">
+              <div className="w-10 h-10 rounded-md overflow-hidden bg-muted flex items-center justify-center">
+                <img
+                  src={product.logo_url || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&h=100&fit=crop"}
+                  alt={`${product.name} logo`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-base leading-tight truncate">{product.name}</h3>
+                {product.contact_email && (
+                  <p className="text-xs text-muted-foreground truncate">{product.contact_email}</p>
+                )}
+              </div>
+            </div>
+
             {/* Description */}
-            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed flex-1">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {product.description || "No description provided"}
             </p>
+
+            {/* Basic Info */}
+            {(product.category || product.target_audience) && (
+              <div className="grid grid-cols-2 gap-3 text-xs mt-3">
+                <div><span className="font-medium">Category:</span> {product.category || "N/A"}</div>
+                <div><span className="font-medium">Audience:</span> {product.target_audience || "N/A"}</div>
+              </div>
+            )}
+
+            {/* Technology Highlights */}
+            {product.tech_highlights && (
+              <div className="mt-3">
+                <div className="text-xs font-medium mb-1">Technology Highlights</div>
+                <p className="text-xs text-muted-foreground">{product.tech_highlights}</p>
+              </div>
+            )}
+
+            {/* Traction Metrics */}
+            {(product.users || product.revenue || product.growth_rate) && (
+              <div className="mt-3">
+                <div className="text-xs font-medium mb-1">Traction</div>
+                <div className="grid grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <div className="text-muted-foreground">Total Users</div>
+                    <div className="font-medium">{product.users || "N/A"}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Monthly Active</div>
+                    <div className="font-medium">{product.growth_rate || "N/A"}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Revenue</div>
+                    <div className="font-medium">{product.revenue || "N/A"}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Partnership Opportunities */}
+            {(product.partnership || product.co_marketing || product.white_label || product.reseller || product.acquisition) && (
+              <div className="mt-3">
+                <div className="text-xs font-medium mb-1">Partnership Opportunities</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {product.partnership && <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px]">General Partnership</span>}
+                  {product.co_marketing && <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px]">Co-marketing</span>}
+                  {product.white_label && <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px]">White Label</span>}
+                  {product.reseller && <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px]">Reseller</span>}
+                  {product.acquisition && <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px]">Acquisition</span>}
+                </div>
+              </div>
+            )}
+
+            {/* Tags */}
+            {product.tags && (
+              <div className="mt-3 text-xs">
+                <span className="font-medium">Tags:</span> {product.tags}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
