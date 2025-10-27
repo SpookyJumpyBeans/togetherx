@@ -393,6 +393,17 @@ export default function Approvals() {
                             </div>
                           )}
                         </div>
+
+                        <div className="pt-4">
+                          <Button
+                            onClick={() => handleReject(product.id)}
+                            variant="outline"
+                            className="w-full"
+                          >
+                            <XCircle className="w-4 h-4 mr-2" />
+                            Move to Rejected
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </Card>
