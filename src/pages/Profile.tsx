@@ -11,7 +11,8 @@ import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { User, Save, Pin, Trophy, Linkedin, Github, Globe, Twitter } from "lucide-react";
+import { User, Save, Pin, Trophy, Linkedin, Github, Globe, Twitter, Edit, Trash2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Profile() {
   const [user, setUser] = useState<any>(null);
@@ -25,9 +26,11 @@ export default function Profile() {
     github: "",
   });
   const [pinnedProducts, setPinnedProducts] = useState<any[]>([]);
+  const [successStories, setSuccessStories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [storyDialogOpen, setStoryDialogOpen] = useState(false);
+  const [editingStory, setEditingStory] = useState<any>(null);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
   const navigate = useNavigate();
@@ -47,6 +50,7 @@ export default function Profile() {
       setUser(session.user);
       await loadProfile(session.user.id);
       await loadPinnedProducts(session.user.id);
+      await loadSuccessStories(session.user.id);
     } catch (err) {
       console.error("Profile init error:", err);
       toast.error("Unable to load your profile");
@@ -130,6 +134,21 @@ export default function Profile() {
     }
   };
 
+  const loadSuccessStories = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("success_stories")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      setSuccessStories(data || []);
+    } catch (err) {
+      console.error("Success stories load error:", err);
+    }
+  };
+
   const handleUnpin = async (productId: string) => {
     if (!user) return;
 
@@ -142,6 +161,35 @@ export default function Profile() {
     if (!error) {
       setPinnedProducts(pinnedProducts.filter((p) => p.id !== productId));
       toast.success("Product unpinned");
+    }
+  };
+
+  const handleDeleteStory = async (storyId: string) => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("success_stories")
+      .delete()
+      .eq("id", storyId)
+      .eq("user_id", user.id);
+
+    if (!error) {
+      setSuccessStories(successStories.filter((s) => s.id !== storyId));
+      toast.success("Success story deleted");
+    } else {
+      toast.error("Failed to delete story");
+    }
+  };
+
+  const handleEditStory = (story: any) => {
+    setEditingStory(story);
+    setStoryDialogOpen(true);
+  };
+
+  const handleStoryDialogClose = (open: boolean) => {
+    setStoryDialogOpen(open);
+    if (!open) {
+      setEditingStory(null);
     }
   };
 
@@ -286,6 +334,62 @@ export default function Profile() {
           </div>
         </section>
 
+        {/* Success Stories Section */}
+        <section className="mb-16">
+          <div className="flex items-center gap-3 mb-8">
+            <Trophy className="w-6 h-6" />
+            <h2 className="text-3xl font-bold">My Success Stories</h2>
+          </div>
+
+          {successStories.length === 0 ? (
+            <div className="text-center py-20 border-2 border-dashed border-border/30 rounded-3xl">
+              <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground text-lg">No success stories yet</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Share your partnership success stories
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {successStories.map((story) => (
+                <Card key={story.id} className="border-border/30 bg-card/50 backdrop-blur-sm">
+                  <CardContent className="p-6">
+                    {story.screenshot && (
+                      <img 
+                        src={story.screenshot} 
+                        alt={story.title}
+                        className="w-full h-48 object-cover rounded-lg mb-4"
+                      />
+                    )}
+                    <h3 className="text-xl font-bold mb-2">{story.title}</h3>
+                    <p className="text-muted-foreground mb-4 line-clamp-3">{story.story}</p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditStory(story)}
+                        className="rounded-full"
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteStory(story.id)}
+                        className="rounded-full text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </section>
+
         {/* Pin Board Section */}
         <section>
           <div className="flex items-center gap-3 mb-8">
@@ -315,7 +419,12 @@ export default function Profile() {
 
       <Footer />
 
-      <SuccessStoryDialog open={storyDialogOpen} onOpenChange={setStoryDialogOpen} />
+      <SuccessStoryDialog 
+        open={storyDialogOpen} 
+        onOpenChange={handleStoryDialogClose}
+        editingStory={editingStory}
+        onSuccess={() => user && loadSuccessStories(user.id)}
+      />
       <EnhancedSubmitDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen} />
       <SubscribeDialog open={subscribeDialogOpen} onOpenChange={setSubscribeDialogOpen} />
     </div>

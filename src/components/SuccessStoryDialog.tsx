@@ -11,15 +11,35 @@ import { Upload, Trophy } from "lucide-react";
 interface SuccessStoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editingStory?: {
+    id: string;
+    title: string;
+    story: string;
+    screenshot: string;
+  } | null;
+  onSuccess?: () => void;
 }
 
-export const SuccessStoryDialog = ({ open, onOpenChange }: SuccessStoryDialogProps) => {
+export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess }: SuccessStoryDialogProps) => {
   const [formData, setFormData] = useState({
-    title: "",
-    story: "",
+    title: editingStory?.title || "",
+    story: editingStory?.story || "",
     screenshot: null as File | null,
   });
   const [loading, setLoading] = useState(false);
+
+  // Update form when editingStory changes
+  useState(() => {
+    if (editingStory) {
+      setFormData({
+        title: editingStory.title,
+        story: editingStory.story,
+        screenshot: null,
+      });
+    } else {
+      setFormData({ title: "", story: "", screenshot: null });
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +54,7 @@ export const SuccessStoryDialog = ({ open, onOpenChange }: SuccessStoryDialogPro
 
     try {
       // Upload screenshot if provided
-      let screenshotUrl = "";
+      let screenshotUrl = editingStory?.screenshot || "";
       if (formData.screenshot) {
         const fileExt = formData.screenshot.name.split('.').pop();
         const fileName = `${session.user.id}/${Math.random()}.${fileExt}`;
@@ -51,25 +71,42 @@ export const SuccessStoryDialog = ({ open, onOpenChange }: SuccessStoryDialogPro
         screenshotUrl = publicUrl;
       }
 
-      const { error } = await supabase
-        .from('success_stories')
-        .insert([{
-          user_id: session.user.id,
-          title: formData.title,
-          story: formData.story,
-          screenshot: screenshotUrl,
-        }]);
+      if (editingStory) {
+        // Update existing story
+        const { error } = await supabase
+          .from('success_stories')
+          .update({
+            title: formData.title,
+            story: formData.story,
+            screenshot: screenshotUrl,
+          })
+          .eq('id', editingStory.id)
+          .eq('user_id', session.user.id);
 
-      if (error) throw error;
+        if (error) throw error;
+        toast.success("Success story updated!");
+      } else {
+        // Insert new story
+        const { error } = await supabase
+          .from('success_stories')
+          .insert([{
+            user_id: session.user.id,
+            title: formData.title,
+            story: formData.story,
+            screenshot: screenshotUrl,
+          }]);
 
-      toast.success("Success story submitted!", {
-        description: "We'll review it and feature it on the landing page.",
-      });
+        if (error) throw error;
+        toast.success("Success story added!");
+      }
 
       setFormData({ title: "", story: "", screenshot: null });
+      onSuccess?.();
       onOpenChange(false);
     } catch (error: any) {
-      toast.error("Failed to submit story", { description: error.message });
+      toast.error(editingStory ? "Failed to update story" : "Failed to add story", { 
+        description: error.message 
+      });
     } finally {
       setLoading(false);
     }
@@ -84,9 +121,11 @@ export const SuccessStoryDialog = ({ open, onOpenChange }: SuccessStoryDialogPro
               <Trophy className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <DialogTitle className="text-2xl font-bold">Share Your Success Story</DialogTitle>
+              <DialogTitle className="text-2xl font-bold">
+                {editingStory ? "Edit Success Story" : "Share Your Success Story"}
+              </DialogTitle>
               <DialogDescription className="text-base">
-                Inspire others with your partnership journey
+                {editingStory ? "Update your success story" : "Inspire others with your partnership journey"}
               </DialogDescription>
             </div>
           </div>
@@ -152,7 +191,7 @@ export const SuccessStoryDialog = ({ open, onOpenChange }: SuccessStoryDialogPro
             size="lg"
             className="w-full rounded-full"
           >
-            {loading ? "Submitting..." : "Submit Success Story"}
+            {loading ? (editingStory ? "Updating..." : "Submitting...") : (editingStory ? "Update Success Story" : "Submit Success Story")}
           </Button>
         </form>
       </DialogContent>

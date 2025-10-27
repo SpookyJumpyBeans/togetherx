@@ -189,12 +189,6 @@ alter table public.success_stories enable row level security;
 -- RLS Policies for success_stories
 do $$ begin
   if not exists (
-    select 1 from pg_policies where schemaname = 'public' and tablename = 'success_stories' and policyname = 'Users can view approved stories'
-  ) then
-    create policy "Users can view approved stories" on public.success_stories
-      for select using (approved = true);
-  end if;
-  if not exists (
     select 1 from pg_policies where schemaname = 'public' and tablename = 'success_stories' and policyname = 'Users can view their own stories'
   ) then
     create policy "Users can view their own stories" on public.success_stories
@@ -205,6 +199,18 @@ do $$ begin
   ) then
     create policy "Authenticated users can insert stories" on public.success_stories
       for insert to authenticated with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'success_stories' and policyname = 'Users can update their own stories'
+  ) then
+    create policy "Users can update their own stories" on public.success_stories
+      for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  end if;
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'success_stories' and policyname = 'Users can delete their own stories'
+  ) then
+    create policy "Users can delete their own stories" on public.success_stories
+      for delete to authenticated using (auth.uid() = user_id);
   end if;
 end $$;
 
