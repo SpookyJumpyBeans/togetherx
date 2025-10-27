@@ -109,7 +109,18 @@ const Index = () => {
       const matchesUsers = (() => {
         if (userFilter.length === 0) return true;
         if (!product.users) return false;
-        const users = typeof product.users === 'string' ? parseInt(product.users.replace(/,/g, '')) : product.users;
+        
+        // Parse user count - handle k (thousand) and m (million) abbreviations
+        const userStr = product.users.toString().toLowerCase().trim();
+        let users = 0;
+        
+        if (userStr.includes('m')) {
+          users = parseFloat(userStr.replace(/[^0-9.]/g, '')) * 1000000;
+        } else if (userStr.includes('k')) {
+          users = parseFloat(userStr.replace(/[^0-9.]/g, '')) * 1000;
+        } else {
+          users = parseFloat(userStr.replace(/[^0-9.]/g, ''));
+        }
         
         return userFilter.some(range => {
           if (range === "0-100") return users >= 0 && users <= 100;
@@ -128,14 +139,14 @@ const Index = () => {
         if (revenueFilter.length === 0) return true;
         if (!product.revenue) return false;
         
-        // Extract numeric value from revenue string (e.g., "$5k MRR" -> 5000)
-        const revenueStr = product.revenue.toString().toLowerCase();
+        // Extract numeric value from revenue string - handle k (thousand) and m (million)
+        const revenueStr = product.revenue.toString().toLowerCase().trim();
         let revenueValue = 0;
         
-        if (revenueStr.includes('k')) {
-          revenueValue = parseFloat(revenueStr.replace(/[^0-9.]/g, '')) * 1000;
-        } else if (revenueStr.includes('m')) {
+        if (revenueStr.includes('m')) {
           revenueValue = parseFloat(revenueStr.replace(/[^0-9.]/g, '')) * 1000000;
+        } else if (revenueStr.includes('k')) {
+          revenueValue = parseFloat(revenueStr.replace(/[^0-9.]/g, '')) * 1000;
         } else {
           revenueValue = parseFloat(revenueStr.replace(/[^0-9.]/g, ''));
         }
