@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "onboarding@resend.dev";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,9 +22,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    if (!RESEND_API_KEY) {
+      console.error("RESEND_API_KEY is not configured");
+      throw new Error("Email service is not configured properly");
+    }
+
     const { founderEmail, productName, senderName, senderEmail, message }: ContactEmailRequest = await req.json();
 
-    console.log("Sending contact email to:", founderEmail, "for product:", productName);
+    console.log("Sending contact email to:", founderEmail, "for product:", productName, "from:", FROM_EMAIL);
 
     // Send email to the founder
     const founderEmailResponse = await fetch("https://api.resend.com/emails", {
@@ -33,7 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Partnership Network <onboarding@resend.dev>",
+        from: `Partnership Network <${FROM_EMAIL}>`,
         to: [founderEmail],
         reply_to: senderEmail,
         subject: `Partnership Inquiry for ${productName}`,
@@ -50,9 +56,9 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (!founderEmailResponse.ok) {
-      const error = await founderEmailResponse.text();
-      console.error("Founder email error:", error);
-      throw new Error(`Failed to send email to founder: ${error}`);
+      const errorText = await founderEmailResponse.text();
+      console.error("Resend API error response:", errorText);
+      throw new Error(`Failed to send email to founder: ${errorText}`);
     }
 
     const founderData = await founderEmailResponse.json();
@@ -66,7 +72,7 @@ const handler = async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Partnership Network <onboarding@resend.dev>",
+        from: `Partnership Network <${FROM_EMAIL}>`,
         to: [senderEmail],
         subject: `Your inquiry about ${productName} has been sent`,
         html: `
@@ -81,8 +87,8 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (!senderEmailResponse.ok) {
-      const error = await senderEmailResponse.text();
-      console.error("Sender email error:", error);
+      const errorText = await senderEmailResponse.text();
+      console.error("Sender confirmation error:", errorText);
       // Don't throw here, founder email was sent successfully
     }
 

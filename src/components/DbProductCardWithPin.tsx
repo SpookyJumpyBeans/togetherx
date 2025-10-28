@@ -143,8 +143,8 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-base leading-tight truncate">{product.name}</h3>
-                {product.contact_email && (
-                  <p className="text-xs text-muted-foreground truncate">{product.contact_email}</p>
+                {product.category && (
+                  <p className="text-xs text-muted-foreground truncate">{product.category}</p>
                 )}
               </div>
             </div>
