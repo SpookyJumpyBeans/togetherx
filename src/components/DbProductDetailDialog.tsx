@@ -97,6 +97,7 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
       }
 
       // Send automated email via edge function
+      console.log("Invoking send-contact-email function...");
       const { data: emailData, error: emailError } = await supabase.functions.invoke('send-contact-email', {
         body: {
           founderEmail: product.contact_email,
@@ -106,9 +107,19 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
         }
       });
 
+      console.log("Function response:", { emailData, emailError });
+
       if (emailError) {
         console.error("Email sending error:", emailError);
-        toast.error("Failed to send contact email. Please try again.");
+        
+        // Provide more helpful error messages
+        if (emailError.message?.includes("Failed to fetch")) {
+          toast.error("Email service is initializing. Please wait a moment and try again.");
+        } else if (emailError.message?.includes("not configured")) {
+          toast.error("Email service needs configuration. Please contact support.");
+        } else {
+          toast.error(`Failed to send email: ${emailError.message || 'Unknown error'}`);
+        }
         return;
       }
 
