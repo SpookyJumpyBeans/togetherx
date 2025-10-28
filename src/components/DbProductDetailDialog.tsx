@@ -76,63 +76,35 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
       return;
     }
 
-    if (!product.contact_email) {
-      toast.error("No contact email available for this product");
-      return;
-    }
-
     setContacting(true);
 
     try {
       // Track the contact in the database (only non-owner contacts count)
-      const { error: trackError } = await supabase
+      const { error } = await supabase
         .from('product_contacts')
         .insert([{
           product_id: product.id,
           user_id: user.id,
         }]);
 
-      if (trackError && trackError.code !== '23505') {
-        throw trackError;
-      }
-
-      // Send automated email via edge function
-      console.log("Invoking send-contact-email function...");
-      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-contact-email', {
-        body: {
-          founderEmail: product.contact_email,
-          productName: product.name,
-          senderName: user.email?.split('@')[0] || 'A Partnership Network User',
-          senderEmail: user.email,
-        }
-      });
-
-      console.log("Function response:", { emailData, emailError });
-
-      if (emailError) {
-        console.error("Email sending error:", emailError);
-        
-        // Provide more helpful error messages
-        if (emailError.message?.includes("Failed to fetch")) {
-          toast.error("Email service is initializing. Please wait a moment and try again.");
-        } else if (emailError.message?.includes("not configured")) {
-          toast.error("Email service needs configuration. Please contact support.");
+      if (error) {
+        // If it's a duplicate (same user contacting same product in same month), ignore
+        if (error.code === '23505') {
+          toast.info("You've already contacted this founder this month");
         } else {
-          toast.error(`Failed to send email: ${emailError.message || 'Unknown error'}`);
+          throw error;
         }
-        return;
+      } else {
+        toast.success("Contact request recorded! Check your email for next steps.");
       }
 
-      console.log("Email sent successfully:", emailData);
-      
-      if (trackError?.code === '23505') {
-        toast.success("Email sent! (You've already contacted this founder this month)");
-      } else {
-        toast.success("Contact email sent successfully! The founder will receive your inquiry.");
+      // Open email client if contact email is available
+      if (product.contact_email) {
+        window.location.href = `mailto:${product.contact_email}?subject=Partnership Inquiry for ${product.name}`;
       }
     } catch (error: any) {
-      console.error("Contact error:", error);
-      toast.error("Failed to process contact request");
+      console.error("Contact tracking error:", error);
+      toast.error("Failed to record contact");
     } finally {
       setContacting(false);
     }
@@ -351,7 +323,7 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
               {contacting ? "Recording..." : "Contact Founder"}
             </Button>
             <p className="text-xs text-muted-foreground text-center">
-              An email will be sent to the founder with your contact information
+              Your contact will be tracked for leaderboard rankings
             </p>
           </div>
         </div>
