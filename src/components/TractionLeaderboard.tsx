@@ -83,7 +83,7 @@ export const TractionLeaderboard = () => {
           monthly_contacts: contactCounts[p.id] || 0,
         }))
         .sort((a, b) => b.monthly_contacts - a.monthly_contacts)
-        .slice(0, 10);
+        .slice(0, 50);
 
       setLeaderboard(combined);
     } catch (e) {
