@@ -241,10 +241,10 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
           onClick={togglePin}
           disabled={loading}
           size="sm"
-          variant={isPinned ? "default" : "secondary"}
+          variant="secondary"
           className="absolute top-3 right-3 rounded-full shadow-lg z-10 h-9 w-9 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
         >
-          <Pin className={`w-4 h-4 ${isPinned ? "fill-current" : ""}`} />
+          <Pin className={`w-4 h-4 text-foreground ${isPinned ? "fill-current" : ""}`} />
         </Button>
       ) : null}
     </div>
