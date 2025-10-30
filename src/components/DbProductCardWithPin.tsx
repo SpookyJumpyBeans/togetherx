@@ -34,9 +34,11 @@ export interface DbProduct {
 interface Props {
   product: DbProduct;
   onClick?: () => void;
+  onUnpin?: (productId: string) => void;
+  showUnpinButton?: boolean;
 }
 
-export const DbProductCardWithPin = ({ product, onClick }: Props) => {
+export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButton }: Props) => {
   const [isPinned, setIsPinned] = useState(false);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -90,6 +92,9 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
       } else {
         setIsPinned(false);
         toast.success("Product unpinned");
+        if (onUnpin) {
+          onUnpin(product.id);
+        }
       }
     } else {
       const { error } = await supabase
@@ -220,8 +225,18 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
         </CardContent>
       </Card>
 
-      {/* Pin Button */}
-      {user && (
+      {/* Pin/Unpin Button */}
+      {user && showUnpinButton && isPinned ? (
+        <Button
+          onClick={togglePin}
+          disabled={loading}
+          size="sm"
+          variant="destructive"
+          className="absolute top-3 right-3 rounded-md shadow-lg z-10 text-xs h-8 px-3"
+        >
+          Unpin
+        </Button>
+      ) : user && !showUnpinButton ? (
         <Button
           onClick={togglePin}
           disabled={loading}
@@ -231,7 +246,7 @@ export const DbProductCardWithPin = ({ product, onClick }: Props) => {
         >
           <Pin className={`w-4 h-4 ${isPinned ? "fill-current" : ""}`} />
         </Button>
-      )}
+      ) : null}
     </div>
   );
 };

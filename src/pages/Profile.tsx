@@ -389,7 +389,11 @@ export default function Profile() {
             <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
               {pinnedProducts.map((product) => (
                 <div key={product.id} className="relative break-inside-avoid mb-6">
-                  <DbProductCardWithPin product={product} />
+                  <DbProductCardWithPin 
+                    product={product} 
+                    showUnpinButton={true}
+                    onUnpin={handleUnpin}
+                  />
                 </div>
               ))}
             </div>
