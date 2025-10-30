@@ -12,7 +12,7 @@ import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { User, Save, Pin, Trophy, Linkedin, Github, Globe, Twitter, Edit, Trash2 } from "lucide-react";
+import { User, Save, Pin, Trophy, Linkedin, Github, Globe, Twitter, Edit, Trash2, Upload } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function Profile() {
@@ -230,44 +230,57 @@ export default function Profile() {
         onSubscribeClick={() => setSubscribeDialogOpen(true)}
       />
 
-      <main className="container mx-auto px-6 md:px-8 py-16 flex-1 max-w-7xl">
+      <main className="container mx-auto px-6 md:px-8 py-12 flex-1 max-w-4xl">
         {/* Profile Section */}
-        <section className="mb-16">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center">
-              <User className="w-8 h-8 text-primary-foreground" />
+        <section className="mb-12">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                <User className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold">My Profile</h1>
+                <p className="text-sm text-muted-foreground">Manage your information and saved products</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold">My Profile</h1>
-              <p className="text-muted-foreground">Manage your account information</p>
-            </div>
+            <Button
+              onClick={handleSaveProfile}
+              disabled={saving}
+              variant="outline"
+              size="sm"
+              className="rounded-md"
+            >
+              {saving ? "Saving..." : "Edit Profile"}
+            </Button>
           </div>
 
-          <div className="space-y-6 max-w-2xl">
-            <div>
-              <Label htmlFor="name" className="text-sm font-medium mb-2 block">
-                Name
-              </Label>
-              <Input
-                id="name"
-                value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                placeholder="Your name"
-                className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
-              />
-            </div>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name" className="text-sm font-medium mb-2 block">
+                  Name
+                </Label>
+                <Input
+                  id="name"
+                  value={profile.name}
+                  onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                  placeholder="Your name"
+                  className="bg-background"
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="role" className="text-sm font-medium mb-2 block">
-                Role
-              </Label>
-              <Input
-                id="role"
-                value={profile.role}
-                onChange={(e) => setProfile({ ...profile, role: e.target.value })}
-                placeholder="e.g., Founder, Developer, Product Manager"
-                className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
-              />
+              <div>
+                <Label htmlFor="role" className="text-sm font-medium mb-2 block">
+                  Role
+                </Label>
+                <Input
+                  id="role"
+                  value={profile.role}
+                  onChange={(e) => setProfile({ ...profile, role: e.target.value })}
+                  placeholder="e.g., Founder, Product Manager"
+                  className="bg-background"
+                />
+              </div>
             </div>
 
             <div>
@@ -280,14 +293,18 @@ export default function Profile() {
                 value={profile.email}
                 onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                 placeholder="your@email.com"
-                className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
+                className="bg-background"
               />
             </div>
 
             {/* Social Links Section */}
-            <div className="pt-6 border-t border-border/30">
-              <h3 className="text-lg font-semibold mb-4">Social Links</h3>
-              <div className="space-y-4">
+            <div className="pt-6 space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Globe className="w-5 h-5 text-muted-foreground" />
+                <h3 className="text-base font-semibold">Social Links</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="linkedin" className="text-sm font-medium mb-2 flex items-center gap-2">
                     <Linkedin className="w-4 h-4" />
@@ -298,21 +315,21 @@ export default function Profile() {
                     value={profile.linkedin}
                     onChange={(e) => setProfile({ ...profile, linkedin: e.target.value })}
                     placeholder="https://linkedin.com/in/yourprofile"
-                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
+                    className="bg-background"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="github" className="text-sm font-medium mb-2 flex items-center gap-2">
-                    <Github className="w-4 h-4" />
-                    GitHub
+                  <Label htmlFor="twitter" className="text-sm font-medium mb-2 flex items-center gap-2">
+                    <Twitter className="w-4 h-4" />
+                    Twitter/X
                   </Label>
                   <Input
-                    id="github"
-                    value={profile.github}
-                    onChange={(e) => setProfile({ ...profile, github: e.target.value })}
-                    placeholder="https://github.com/yourusername"
-                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
+                    id="twitter"
+                    value={profile.twitter}
+                    onChange={(e) => setProfile({ ...profile, twitter: e.target.value })}
+                    placeholder="https://twitter.com/yourusername"
+                    className="bg-background"
                   />
                 </div>
 
@@ -326,108 +343,45 @@ export default function Profile() {
                     value={profile.website}
                     onChange={(e) => setProfile({ ...profile, website: e.target.value })}
                     placeholder="https://yourwebsite.com"
-                    className="border-0 border-b-2 border-border/50 rounded-none focus:border-primary transition-colors bg-transparent shadow-none px-0"
+                    className="bg-background"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="github" className="text-sm font-medium mb-2 flex items-center gap-2">
+                    <Github className="w-4 h-4" />
+                    GitHub
+                  </Label>
+                  <Input
+                    id="github"
+                    value={profile.github}
+                    onChange={(e) => setProfile({ ...profile, github: e.target.value })}
+                    placeholder="https://github.com/yourusername"
+                    className="bg-background"
                   />
                 </div>
               </div>
             </div>
-
-            <div className="flex gap-4 pt-4">
-              <Button
-                onClick={handleSaveProfile}
-                disabled={saving}
-                className="rounded-full px-8 bg-foreground text-background hover:bg-foreground/90"
-                size="lg"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {saving ? "Saving..." : "Save Profile"}
-              </Button>
-
-              <Button
-                onClick={() => setStoryDialogOpen(true)}
-                variant="outline"
-                className="rounded-full px-8"
-                size="lg"
-              >
-                <Trophy className="w-4 h-4 mr-2" />
-                Share Success Story
-              </Button>
-            </div>
           </div>
-        </section>
-
-        {/* Success Stories Section */}
-        <section className="mb-16">
-          <div className="flex items-center gap-3 mb-8">
-            <Trophy className="w-6 h-6" />
-            <h2 className="text-3xl font-bold">My Success Stories</h2>
-          </div>
-
-          {successStories.length === 0 ? (
-            <div className="text-center py-20 border-2 border-dashed border-border/30 rounded-3xl">
-              <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground text-lg">No success stories yet</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Share your partnership success stories
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {successStories.map((story) => (
-                <Card 
-                  key={story.id} 
-                  className="border-border/30 bg-card/50 backdrop-blur-sm cursor-pointer hover:border-primary/50 transition-colors"
-                  onClick={() => handleStoryClick(story)}
-                >
-                  <CardContent className="p-6">
-                    {story.screenshot && (
-                      <img 
-                        src={story.screenshot} 
-                        alt={story.title}
-                        className="w-full h-48 object-cover rounded-lg mb-4"
-                      />
-                    )}
-                    <h3 className="text-xl font-bold mb-2">{story.title}</h3>
-                    <p className="text-muted-foreground mb-4 line-clamp-3">{story.story}</p>
-                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditStory(story)}
-                        className="rounded-full"
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeleteStory(story.id)}
-                        className="rounded-full text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Delete
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
         </section>
 
         {/* Pin Board Section */}
-        <section>
-          <div className="flex items-center gap-3 mb-8">
-            <Pin className="w-6 h-6" />
-            <h2 className="text-3xl font-bold">Saved Products</h2>
+        <section className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+              <Pin className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold">Pin Board</h2>
+              <p className="text-sm text-muted-foreground">Products you've saved for later ({pinnedProducts.length})</p>
+            </div>
           </div>
 
           {pinnedProducts.length === 0 ? (
-            <div className="text-center py-20 border-2 border-dashed border-border/30 rounded-3xl">
-              <Pin className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground text-lg">No saved products yet</p>
-              <p className="text-sm text-muted-foreground mt-2">
+            <div className="text-center py-16 border-2 border-dashed border-border/30 rounded-xl bg-muted/20">
+              <Pin className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+              <p className="text-muted-foreground">No saved products yet</p>
+              <p className="text-sm text-muted-foreground mt-1">
                 Save products to your board from the main page
               </p>
             </div>
@@ -438,6 +392,108 @@ export default function Profile() {
                   <DbProductCardWithPin product={product} />
                 </div>
               ))}
+            </div>
+          )}
+        </section>
+
+        {/* Success Stories Section */}
+        <section className="mb-12">
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-2">Share Your Success Story</h2>
+            <p className="text-sm text-muted-foreground">Have a partnership success story? Share it with the community!</p>
+          </div>
+
+          <div className="space-y-4 bg-card border border-border rounded-xl p-6">
+            <div>
+              <Label htmlFor="story-title" className="text-sm font-medium mb-2 block">
+                Title
+              </Label>
+              <Input
+                id="story-title"
+                placeholder="E.g., Found the perfect co-marketing partner"
+                className="bg-background"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="story-text" className="text-sm font-medium mb-2 block">
+                Your Story
+              </Label>
+              <div className="relative">
+                <textarea
+                  id="story-text"
+                  placeholder="Share your experience and the outcome..."
+                  className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium mb-2 block">
+                Screenshot (Optional)
+              </Label>
+              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer">
+                <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">Click to upload an image</p>
+              </div>
+            </div>
+
+            <Button
+              onClick={() => setStoryDialogOpen(true)}
+              className="w-full rounded-md bg-foreground text-background hover:bg-foreground/90"
+            >
+              Submit Story
+            </Button>
+          </div>
+
+          {successStories.length > 0 && (
+            <div className="mt-8 space-y-4">
+              <h3 className="text-lg font-semibold">Your Stories</h3>
+              <div className="grid grid-cols-1 gap-4">
+                {successStories.map((story) => (
+                  <Card 
+                    key={story.id} 
+                    className="border-border/30 bg-card/50 backdrop-blur-sm cursor-pointer hover:border-primary/50 transition-colors"
+                    onClick={() => handleStoryClick(story)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex gap-4">
+                        {story.screenshot && (
+                          <img 
+                            src={story.screenshot} 
+                            alt={story.title}
+                            className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold mb-1">{story.title}</h4>
+                          <p className="text-sm text-muted-foreground line-clamp-2">{story.story}</p>
+                          <div className="flex gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditStory(story)}
+                              className="h-8 text-xs"
+                            >
+                              <Edit className="w-3 h-3 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteStory(story.id)}
+                              className="h-8 text-xs text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-3 h-3 mr-1" />
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           )}
         </section>
