@@ -197,43 +197,66 @@ const Index = () => {
       </section>
 
       {/* Filters Section */}
-      <section className="container mx-auto px-6 md:px-8 py-8">
-        <div className="max-w-7xl mx-auto space-y-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1 space-y-3">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Categories</label>
-                <TagSelector
-                  value={categoryFilter}
-                  onChange={setCategoryFilter}
-                  suggestions={CATEGORY_SUGGESTIONS}
-                  placeholder="Filter by categories..."
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Target Audience</label>
-                <TagSelector
-                  value={audienceFilter}
-                  onChange={setAudienceFilter}
-                  suggestions={TARGET_AUDIENCE_SUGGESTIONS}
-                  placeholder="Filter by audience..."
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">User Count</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between h-11 rounded-lg border-border bg-background">
-                      <span className="text-sm">
-                        {userFilter.length > 0 ? `${userFilter.length} selected` : "Filter by user count..."}
-                      </span>
-                      <ChevronDown className="h-4 w-4 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full p-3 bg-background z-50" align="start">
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
+      <section className="container mx-auto px-6 md:px-8 py-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Category Filter */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-9 rounded-full border-border bg-background px-4 text-sm">
+                  {categoryFilter.length > 0 ? `Categories (${categoryFilter.length})` : "All Categories"}
+                  <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-3 bg-background z-50" align="start">
+                <div className="space-y-2">
+                  <div className="text-sm font-medium mb-2">Select Categories</div>
+                  <TagSelector
+                    value={categoryFilter}
+                    onChange={setCategoryFilter}
+                    suggestions={CATEGORY_SUGGESTIONS}
+                    placeholder="Type to filter categories..."
+                  />
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* Audience Filter */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-9 rounded-full border-border bg-background px-4 text-sm">
+                  {audienceFilter.length > 0 ? `Audiences (${audienceFilter.length})` : "All Audiences"}
+                  <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-3 bg-background z-50" align="start">
+                <div className="space-y-2">
+                  <div className="text-sm font-medium mb-2">Select Target Audiences</div>
+                  <TagSelector
+                    value={audienceFilter}
+                    onChange={setAudienceFilter}
+                    suggestions={TARGET_AUDIENCE_SUGGESTIONS}
+                    placeholder="Type to filter audiences..."
+                  />
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* Users & Revenue Combined Filter */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-9 rounded-full border-border bg-background px-4 text-sm">
+                  {userFilter.length > 0 || revenueFilter.length > 0 
+                    ? `Traction (${userFilter.length + revenueFilter.length})` 
+                    : "All"}
+                  <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-3 bg-background z-50" align="start">
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-sm font-medium mb-2">User Count</div>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
                       {USER_RANGES.map((range) => (
                         <div key={range} className="flex items-center space-x-2">
                           <Checkbox
@@ -253,23 +276,11 @@ const Index = () => {
                         </div>
                       ))}
                     </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Revenue</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between h-11 rounded-lg border-border bg-background">
-                      <span className="text-sm">
-                        {revenueFilter.length > 0 ? `${revenueFilter.length} selected` : "Filter by revenue..."}
-                      </span>
-                      <ChevronDown className="h-4 w-4 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full p-3 bg-background z-50" align="start">
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                  </div>
+                  
+                  <div>
+                    <div className="text-sm font-medium mb-2">Revenue</div>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
                       {REVENUE_RANGES.map((range) => (
                         <div key={range} className="flex items-center space-x-2">
                           <Checkbox
@@ -289,38 +300,34 @@ const Index = () => {
                         </div>
                       ))}
                     </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
 
-            <div className="flex flex-col gap-3 lg:w-96">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Time Period</label>
-                <Select value={dateFilter} onValueChange={setDateFilter}>
-                  <SelectTrigger className="h-11 rounded-lg border-border bg-background">
-                    <SelectValue placeholder="All Time" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Time</SelectItem>
-                    <SelectItem value="today">Today</SelectItem>
-                    <SelectItem value="week">This Week</SelectItem>
-                    <SelectItem value="month">This Month</SelectItem>
-                    <SelectItem value="year">This Year</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Time Filter */}
+            <Select value={dateFilter} onValueChange={setDateFilter}>
+              <SelectTrigger className="h-9 w-auto rounded-full border-border bg-background px-4 text-sm">
+                <SelectValue placeholder="All Time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Time</SelectItem>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="week">This Week</SelectItem>
+                <SelectItem value="month">This Month</SelectItem>
+                <SelectItem value="year">This Year</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Search</label>
-                <Input
-                  type="text"
-                  placeholder="Search by name, description, tags..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-11 rounded-lg border-border bg-background px-4 placeholder:text-muted-foreground"
-                />
-              </div>
+            {/* Search - Right aligned on desktop */}
+            <div className="ml-auto w-full sm:w-auto">
+              <Input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9 rounded-full border-border bg-background px-4 w-full sm:w-64 placeholder:text-muted-foreground text-sm"
+              />
             </div>
           </div>
         </div>
