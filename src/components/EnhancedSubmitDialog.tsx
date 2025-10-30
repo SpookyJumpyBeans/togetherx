@@ -162,6 +162,20 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
       return;
     }
 
+    // Validate proof images for traction metrics
+    if (formData.users && !formData.usersFile) {
+      toast.error("Please upload proof image for Users/DAU/MAU");
+      return;
+    }
+    if (formData.revenue && !formData.revenueFile) {
+      toast.error("Please upload proof image for Revenue");
+      return;
+    }
+    if (formData.growthRate && !formData.growthFile) {
+      toast.error("Please upload proof image for Growth Rate");
+      return;
+    }
+
     // Check if user is authenticated after validation
     if (!user) {
       saveFormData();
@@ -508,7 +522,11 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
                   htmlFor="users-file"
                   className="flex items-center justify-center h-10 px-4 rounded-lg bg-muted hover:bg-muted/80 cursor-pointer text-sm"
                 >
-                  Choose File {formData.usersFile && '✓'}
+                  {formData.users ? (
+                    <span className="text-destructive">Proof Required {formData.usersFile && '✓'}</span>
+                  ) : (
+                    <span>Choose File {formData.usersFile && '✓'}</span>
+                  )}
                 </Label>
               </div>
 
@@ -541,7 +559,11 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
                   htmlFor="revenue-file"
                   className="flex items-center justify-center h-10 px-4 rounded-lg bg-muted hover:bg-muted/80 cursor-pointer text-sm"
                 >
-                  Choose File {formData.revenueFile && '✓'}
+                  {formData.revenue ? (
+                    <span className="text-destructive">Proof Required {formData.revenueFile && '✓'}</span>
+                  ) : (
+                    <span>Choose File {formData.revenueFile && '✓'}</span>
+                  )}
                 </Label>
               </div>
 
@@ -574,7 +596,11 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
                   htmlFor="growth-file"
                   className="flex items-center justify-center h-10 px-4 rounded-lg bg-muted hover:bg-muted/80 cursor-pointer text-sm"
                 >
-                  Choose File {formData.growthFile && '✓'}
+                  {formData.growthRate ? (
+                    <span className="text-destructive">Proof Required {formData.growthFile && '✓'}</span>
+                  ) : (
+                    <span>Choose File {formData.growthFile && '✓'}</span>
+                  )}
                 </Label>
               </div>
             </div>

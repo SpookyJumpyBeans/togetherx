@@ -145,6 +145,15 @@ export default function EditProduct() {
       return;
     }
 
+    // Validate proof images for traction metrics - require at least one screenshot for proof
+    const hasProofImages = existingScreenshots.length > 0 || screenshots.length > 0;
+    const hasTractionMetrics = form.users || form.revenue || form.growthRate;
+    
+    if (hasTractionMetrics && !hasProofImages) {
+      toast.error("Please upload at least one screenshot as proof for traction metrics");
+      return;
+    }
+
     if (!userId) return;
 
     setSaving(true);

@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { CheckCircle, XCircle, Clock, AlertCircle, ExternalLink } from "lucide-react";
 import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { DbProductDetailDialog } from "@/components/DbProductDetailDialog";
 import {
   Tabs,
   TabsContent,
@@ -22,6 +23,8 @@ export default function Approvals() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -154,7 +157,10 @@ export default function Approvals() {
             ) : (
               <div className="grid grid-cols-1 gap-6">
                 {pendingProducts.map((product) => (
-                <Card key={product.id} className="overflow-hidden">
+                <Card key={product.id} className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
+                  setSelectedProduct(product);
+                  setDetailDialogOpen(true);
+                }}>
                     <div className="grid md:grid-cols-[300px_1fr] gap-6">
                       <div className="h-48 md:h-full bg-muted">
                         <img
@@ -259,14 +265,20 @@ export default function Approvals() {
 
                         <div className="flex gap-2 pt-4">
                           <Button
-                            onClick={() => handleApprove(product.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleApprove(product.id);
+                            }}
                             className="flex-1 bg-success hover:bg-success/90"
                           >
                             <CheckCircle className="w-4 h-4 mr-2" />
                             Approve
                           </Button>
                           <Button
-                            onClick={() => handleReject(product.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleReject(product.id);
+                            }}
                             variant="destructive"
                             className="flex-1"
                           >
@@ -291,7 +303,10 @@ export default function Approvals() {
             ) : (
               <div className="grid grid-cols-1 gap-6">
                 {approvedProducts.map((product) => (
-                  <Card key={product.id} className="overflow-hidden">
+                  <Card key={product.id} className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
+                    setSelectedProduct(product);
+                    setDetailDialogOpen(true);
+                  }}>
                     <div className="grid md:grid-cols-[300px_1fr] gap-6">
                       <div className="h-48 md:h-full bg-muted">
                         <img
@@ -396,7 +411,10 @@ export default function Approvals() {
 
                         <div className="pt-4">
                           <Button
-                            onClick={() => handleReject(product.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleReject(product.id);
+                            }}
                             variant="outline"
                             className="w-full"
                           >
@@ -422,7 +440,10 @@ export default function Approvals() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {rejectedProducts.map((product) => (
                   <div key={product.id} className="opacity-60">
-                    <Card className="overflow-hidden">
+                    <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
+                      setSelectedProduct(product);
+                      setDetailDialogOpen(true);
+                    }}>
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
                           {product.name}
@@ -432,6 +453,7 @@ export default function Approvals() {
                               target="_blank" 
                               rel="noopener noreferrer"
                               className="text-primary hover:text-primary/80"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               <ExternalLink className="w-4 h-4" />
                             </a>
@@ -442,7 +464,10 @@ export default function Approvals() {
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
                         <Button
-                          onClick={() => handleApprove(product.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleApprove(product.id);
+                          }}
                           className="w-full"
                           variant="outline"
                         >
@@ -463,6 +488,11 @@ export default function Approvals() {
 
       <EnhancedSubmitDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen} />
       <SubscribeDialog open={subscribeDialogOpen} onOpenChange={setSubscribeDialogOpen} />
+      <DbProductDetailDialog 
+        product={selectedProduct} 
+        open={detailDialogOpen} 
+        onOpenChange={setDetailDialogOpen} 
+      />
     </div>
   );
 }
