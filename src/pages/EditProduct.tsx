@@ -61,6 +61,12 @@ export default function EditProduct() {
   const [logo, setLogo] = useState<File | null>(null);
   const [existingScreenshots, setExistingScreenshots] = useState<string[]>([]);
   const [existingLogo, setExistingLogo] = useState<string>("");
+  const [usersProofFile, setUsersProofFile] = useState<File | null>(null);
+  const [revenueProofFile, setRevenueProofFile] = useState<File | null>(null);
+  const [growthProofFile, setGrowthProofFile] = useState<File | null>(null);
+  const [existingUsersProof, setExistingUsersProof] = useState<string>("");
+  const [existingRevenueProof, setExistingRevenueProof] = useState<string>("");
+  const [existingGrowthProof, setExistingGrowthProof] = useState<string>("");
 
   useEffect(() => {
     document.title = "Edit Product | Marketplace";
@@ -119,6 +125,15 @@ export default function EditProduct() {
       if (data.logo_url) {
         setExistingLogo(data.logo_url);
       }
+      if (data.users_screenshot_url) {
+        setExistingUsersProof(data.users_screenshot_url);
+      }
+      if (data.revenue_screenshot_url) {
+        setExistingRevenueProof(data.revenue_screenshot_url);
+      }
+      if (data.growth_screenshot_url) {
+        setExistingGrowthProof(data.growth_screenshot_url);
+      }
       
       setLoading(false);
     };
@@ -145,12 +160,17 @@ export default function EditProduct() {
       return;
     }
 
-    // Validate proof images for traction metrics - require at least one screenshot for proof
-    const hasProofImages = existingScreenshots.length > 0 || screenshots.length > 0;
-    const hasTractionMetrics = form.users || form.revenue || form.growthRate;
-    
-    if (hasTractionMetrics && !hasProofImages) {
-      toast.error("Please upload at least one screenshot as proof for traction metrics");
+    // Validate proof images for traction metrics
+    if (form.users && !existingUsersProof && !usersProofFile) {
+      toast.error("Please upload proof for Users/DAU/MAU");
+      return;
+    }
+    if (form.revenue && !existingRevenueProof && !revenueProofFile) {
+      toast.error("Please upload proof for Revenue");
+      return;
+    }
+    if (form.growthRate && !existingGrowthProof && !growthProofFile) {
+      toast.error("Please upload proof for Growth Rate");
       return;
     }
 
@@ -201,6 +221,56 @@ export default function EditProduct() {
         logoUrl = publicUrl;
       }
 
+      // Upload traction proof screenshots
+      let usersProofUrl = existingUsersProof;
+      let revenueProofUrl = existingRevenueProof;
+      let growthProofUrl = existingGrowthProof;
+
+      if (usersProofFile) {
+        const fileExt = usersProofFile.name.split('.').pop();
+        const fileName = `${userId}/proof_users_${Date.now()}.${fileExt}`;
+        const { error } = await supabase.storage
+          .from('product-assets')
+          .upload(fileName, usersProofFile);
+        
+        if (!error) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-assets')
+            .getPublicUrl(fileName);
+          usersProofUrl = publicUrl;
+        }
+      }
+
+      if (revenueProofFile) {
+        const fileExt = revenueProofFile.name.split('.').pop();
+        const fileName = `${userId}/proof_revenue_${Date.now()}.${fileExt}`;
+        const { error } = await supabase.storage
+          .from('product-assets')
+          .upload(fileName, revenueProofFile);
+        
+        if (!error) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-assets')
+            .getPublicUrl(fileName);
+          revenueProofUrl = publicUrl;
+        }
+      }
+
+      if (growthProofFile) {
+        const fileExt = growthProofFile.name.split('.').pop();
+        const fileName = `${userId}/proof_growth_${Date.now()}.${fileExt}`;
+        const { error } = await supabase.storage
+          .from('product-assets')
+          .upload(fileName, growthProofFile);
+        
+        if (!error) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-assets')
+            .getPublicUrl(fileName);
+          growthProofUrl = publicUrl;
+        }
+      }
+
       const { error } = await supabase
         .from("products")
         .update({
@@ -215,6 +285,9 @@ export default function EditProduct() {
           users: form.users || null,
           revenue: form.revenue || null,
           growth_rate: form.growthRate || null,
+          users_screenshot_url: usersProofUrl || null,
+          revenue_screenshot_url: revenueProofUrl || null,
+          growth_screenshot_url: growthProofUrl || null,
           co_marketing: form.coMarketing,
           white_label: form.whiteLabel,
           acquisition: form.acquisition,
@@ -443,7 +516,7 @@ export default function EditProduct() {
                 <h3 className="font-semibold text-lg">Traction Metrics</h3>
 
                 <div className="space-y-2">
-                  <Label htmlFor="users">Users</Label>
+                  <Label htmlFor="users">Users {form.users && <span className="text-destructive">*</span>}</Label>
                   <Select value={form.users} onValueChange={(value) => setForm({ ...form, users: value })}>
                     <SelectTrigger className="h-12">
                       <SelectValue placeholder="Select user range" />
@@ -456,10 +529,44 @@ export default function EditProduct() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {form.users && (
+                    <div className="space-y-2 pt-2">
+                      <Label>Users Proof {form.users && "(Required)"}</Label>
+                      {(existingUsersProof || usersProofFile) && (
+                        <div className="relative w-32 h-32 rounded-lg overflow-hidden border">
+                          <img
+                            src={usersProofFile ? URL.createObjectURL(usersProofFile) : existingUsersProof}
+                            alt="Users proof"
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setUsersProofFile(null);
+                              setExistingUsersProof("");
+                            }}
+                            className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                      <label className="flex items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/50">
+                        <div className="flex flex-col items-center">
+                          <Upload className="w-6 h-6 mb-1 text-muted-foreground" />
+                          <p className="text-xs text-muted-foreground">Upload proof</p>
+                        </div>
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setUsersProofFile(file);
+                        }} />
+                      </label>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="revenue">Revenue Range</Label>
+                  <Label htmlFor="revenue">Revenue Range {form.revenue && <span className="text-destructive">*</span>}</Label>
                   <Select value={form.revenue} onValueChange={(value) => setForm({ ...form, revenue: value })}>
                     <SelectTrigger className="h-12">
                       <SelectValue placeholder="Select revenue range" />
@@ -472,10 +579,44 @@ export default function EditProduct() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {form.revenue && (
+                    <div className="space-y-2 pt-2">
+                      <Label>Revenue Proof {form.revenue && "(Required)"}</Label>
+                      {(existingRevenueProof || revenueProofFile) && (
+                        <div className="relative w-32 h-32 rounded-lg overflow-hidden border">
+                          <img
+                            src={revenueProofFile ? URL.createObjectURL(revenueProofFile) : existingRevenueProof}
+                            alt="Revenue proof"
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRevenueProofFile(null);
+                              setExistingRevenueProof("");
+                            }}
+                            className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                      <label className="flex items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/50">
+                        <div className="flex flex-col items-center">
+                          <Upload className="w-6 h-6 mb-1 text-muted-foreground" />
+                          <p className="text-xs text-muted-foreground">Upload proof</p>
+                        </div>
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setRevenueProofFile(file);
+                        }} />
+                      </label>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="growthRate">Growth Rate</Label>
+                  <Label htmlFor="growthRate">Growth Rate {form.growthRate && <span className="text-destructive">*</span>}</Label>
                   <Select value={form.growthRate} onValueChange={(value) => setForm({ ...form, growthRate: value })}>
                     <SelectTrigger className="h-12">
                       <SelectValue placeholder="Select growth rate" />
@@ -488,6 +629,40 @@ export default function EditProduct() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {form.growthRate && (
+                    <div className="space-y-2 pt-2">
+                      <Label>Growth Proof {form.growthRate && "(Required)"}</Label>
+                      {(existingGrowthProof || growthProofFile) && (
+                        <div className="relative w-32 h-32 rounded-lg overflow-hidden border">
+                          <img
+                            src={growthProofFile ? URL.createObjectURL(growthProofFile) : existingGrowthProof}
+                            alt="Growth proof"
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setGrowthProofFile(null);
+                              setExistingGrowthProof("");
+                            }}
+                            className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                      <label className="flex items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/50">
+                        <div className="flex flex-col items-center">
+                          <Upload className="w-6 h-6 mb-1 text-muted-foreground" />
+                          <p className="text-xs text-muted-foreground">Upload proof</p>
+                        </div>
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setGrowthProofFile(file);
+                        }} />
+                      </label>
+                    </div>
+                  )}
                 </div>
               </div>
 

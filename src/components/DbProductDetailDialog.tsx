@@ -25,6 +25,9 @@ export interface DbProduct {
   users?: string;
   revenue?: string;
   growth_rate?: string;
+  users_screenshot_url?: string;
+  revenue_screenshot_url?: string;
+  growth_screenshot_url?: string;
   partnership?: boolean;
   co_marketing?: boolean;
   white_label?: boolean;
@@ -262,6 +265,45 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
                   <p className="font-medium">{product.growth_rate || "Not disclosed"}</p>
                 </div>
               </div>
+              
+              {/* Traction Proof Screenshots - Only shown in approval context */}
+              {(product?.users_screenshot_url || product?.revenue_screenshot_url || product?.growth_screenshot_url) && (
+                <div className="space-y-3 pt-3 border-t">
+                  <h4 className="text-sm font-semibold text-muted-foreground">Traction Proof</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {product.users_screenshot_url && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">Users Proof</p>
+                        <img 
+                          src={product.users_screenshot_url} 
+                          alt="Users proof" 
+                          className="w-full h-32 object-cover rounded-lg border"
+                        />
+                      </div>
+                    )}
+                    {product.revenue_screenshot_url && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">Revenue Proof</p>
+                        <img 
+                          src={product.revenue_screenshot_url} 
+                          alt="Revenue proof" 
+                          className="w-full h-32 object-cover rounded-lg border"
+                        />
+                      </div>
+                    )}
+                    {product.growth_screenshot_url && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">Growth Proof</p>
+                        <img 
+                          src={product.growth_screenshot_url} 
+                          alt="Growth proof" 
+                          className="w-full h-32 object-cover rounded-lg border"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

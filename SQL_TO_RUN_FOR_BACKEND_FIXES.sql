@@ -138,12 +138,18 @@ add column if not exists acquisition_details text;
 alter table public.products 
 add column if not exists screenshot_urls text[];
 
--- 8) Create storage bucket for product assets (screenshots and logos)
+-- 8) Add traction proof screenshot columns
+alter table public.products 
+add column if not exists users_screenshot_url text,
+add column if not exists revenue_screenshot_url text,
+add column if not exists growth_screenshot_url text;
+
+-- 9) Create storage bucket for product assets (screenshots and logos)
 insert into storage.buckets (id, name, public)
 values ('product-assets', 'product-assets', true)
 on conflict (id) do nothing;
 
--- 9) Storage RLS policies for product-assets bucket
+-- 10) Storage RLS policies for product-assets bucket
 create policy "Anyone can view product assets"
 on storage.objects for select
 using (bucket_id = 'product-assets');
@@ -172,7 +178,7 @@ using (
 -- Refresh API cache
 select pg_notify('pgrst','reload schema');
 
--- 10) Create success_stories table
+-- 11) Create success_stories table
 create table if not exists public.success_stories (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade not null,

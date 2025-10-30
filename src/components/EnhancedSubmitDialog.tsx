@@ -79,6 +79,7 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
   };
 
   const saveFormData = () => {
+    // Save text data to localStorage
     const dataToSave = {
       ...formData,
       screenshots: [],
@@ -90,14 +91,59 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
     };
     localStorage.setItem('submitProductFormData', JSON.stringify(dataToSave));
     localStorage.setItem('auto_submit_after_auth', 'true');
+    
+    // Save file data to IndexedDB
+    const filesToSave: { [key: string]: File } = {};
+    if (formData.logo) filesToSave.logo = formData.logo;
+    if (formData.usersFile) filesToSave.usersFile = formData.usersFile;
+    if (formData.revenueFile) filesToSave.revenueFile = formData.revenueFile;
+    if (formData.growthFile) filesToSave.growthFile = formData.growthFile;
+    formData.screenshots.forEach((file, idx) => {
+      filesToSave[`screenshot_${idx}`] = file;
+    });
+    
+    if (Object.keys(filesToSave).length > 0) {
+      saveFilesToIndexedDB(filesToSave);
+    }
   };
 
-  const loadSavedFormData = () => {
+  const loadSavedFormData = async () => {
     const savedData = localStorage.getItem('submitProductFormData');
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
-        setFormData(prev => ({ ...prev, ...parsed }));
+        
+        // Load files from IndexedDB
+        const savedFiles = await loadFilesFromIndexedDB();
+        const screenshots: File[] = [];
+        let logo: File | null = null;
+        let usersFile: File | null = null;
+        let revenueFile: File | null = null;
+        let growthFile: File | null = null;
+        
+        Object.entries(savedFiles).forEach(([key, file]) => {
+          if (key.startsWith('screenshot_')) {
+            screenshots.push(file);
+          } else if (key === 'logo') {
+            logo = file;
+          } else if (key === 'usersFile') {
+            usersFile = file;
+          } else if (key === 'revenueFile') {
+            revenueFile = file;
+          } else if (key === 'growthFile') {
+            growthFile = file;
+          }
+        });
+        
+        setFormData(prev => ({ 
+          ...prev, 
+          ...parsed, 
+          screenshots,
+          logo,
+          usersFile,
+          revenueFile,
+          growthFile
+        }));
       } catch (e) {
         console.error('Failed to load saved form data');
       }
@@ -106,6 +152,88 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
 
   const clearSavedFormData = () => {
     localStorage.removeItem('submitProductFormData');
+    clearIndexedDBFiles();
+  };
+
+  // IndexedDB helpers for file persistence
+  const saveFilesToIndexedDB = async (files: { [key: string]: File }) => {
+    try {
+      const db = await openFileDB();
+      const tx = db.transaction('files', 'readwrite');
+      const store = tx.objectStore('files');
+      
+      for (const [key, file] of Object.entries(files)) {
+        store.put(file, key);
+      }
+      
+      return new Promise<void>((resolve, reject) => {
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    } catch (e) {
+      console.error('Failed to save files to IndexedDB');
+    }
+  };
+
+  const loadFilesFromIndexedDB = async (): Promise<{ [key: string]: File }> => {
+    try {
+      const db = await openFileDB();
+      const tx = db.transaction('files', 'readonly');
+      const store = tx.objectStore('files');
+      
+      const keysRequest = store.getAllKeys();
+      const keys = await new Promise<IDBValidKey[]>((resolve, reject) => {
+        keysRequest.onsuccess = () => resolve(keysRequest.result);
+        keysRequest.onerror = () => reject(keysRequest.error);
+      });
+      
+      const files: { [key: string]: File } = {};
+      
+      for (const key of keys) {
+        const getRequest = store.get(key);
+        const file = await new Promise<File | undefined>((resolve, reject) => {
+          getRequest.onsuccess = () => resolve(getRequest.result);
+          getRequest.onerror = () => reject(getRequest.error);
+        });
+        if (file) files[key as string] = file;
+      }
+      
+      return files;
+    } catch (e) {
+      return {};
+    }
+  };
+
+  const clearIndexedDBFiles = async () => {
+    try {
+      const db = await openFileDB();
+      const tx = db.transaction('files', 'readwrite');
+      const store = tx.objectStore('files');
+      store.clear();
+      
+      return new Promise<void>((resolve, reject) => {
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    } catch (e) {
+      console.error('Failed to clear IndexedDB files');
+    }
+  };
+
+  const openFileDB = (): Promise<IDBDatabase> => {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('ProductFormFiles', 1);
+      
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
+      
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains('files')) {
+          db.createObjectStore('files');
+        }
+      };
+    });
   };
 
   const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -234,6 +362,56 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
         }
       }
 
+      // Upload traction proof screenshots
+      let usersScreenshotUrl = null;
+      let revenueScreenshotUrl = null;
+      let growthScreenshotUrl = null;
+
+      if (formData.usersFile) {
+        const fileExt = formData.usersFile.name.split('.').pop();
+        const filePath = `${user.id}/proof_users_${Date.now()}.${fileExt}`;
+        const { error } = await supabase.storage
+          .from('product-assets')
+          .upload(filePath, formData.usersFile);
+        
+        if (!error) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-assets')
+            .getPublicUrl(filePath);
+          usersScreenshotUrl = publicUrl;
+        }
+      }
+
+      if (formData.revenueFile) {
+        const fileExt = formData.revenueFile.name.split('.').pop();
+        const filePath = `${user.id}/proof_revenue_${Date.now()}.${fileExt}`;
+        const { error } = await supabase.storage
+          .from('product-assets')
+          .upload(filePath, formData.revenueFile);
+        
+        if (!error) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-assets')
+            .getPublicUrl(filePath);
+          revenueScreenshotUrl = publicUrl;
+        }
+      }
+
+      if (formData.growthFile) {
+        const fileExt = formData.growthFile.name.split('.').pop();
+        const filePath = `${user.id}/proof_growth_${Date.now()}.${fileExt}`;
+        const { error } = await supabase.storage
+          .from('product-assets')
+          .upload(filePath, formData.growthFile);
+        
+        if (!error) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-assets')
+            .getPublicUrl(filePath);
+          growthScreenshotUrl = publicUrl;
+        }
+      }
+
       const { error: insertError } = await supabase
         .from('products')
         .insert([{
@@ -252,6 +430,9 @@ export const EnhancedSubmitDialog = ({ open, onOpenChange }: EnhancedSubmitDialo
           users: formData.users || null,
           revenue: formData.revenue || null,
           growth_rate: formData.growthRate || null,
+          users_screenshot_url: usersScreenshotUrl,
+          revenue_screenshot_url: revenueScreenshotUrl,
+          growth_screenshot_url: growthScreenshotUrl,
           show_on_leaderboard: formData.showOnLeaderboard,
           partnership: formData.partnership,
           co_marketing: formData.coMarketing,
