@@ -63,7 +63,7 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate("/auth");
+    navigate("/");
   };
 
   return (
