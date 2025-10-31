@@ -43,7 +43,6 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    s;
     setLoading(true);
 
     const {
