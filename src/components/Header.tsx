@@ -27,7 +27,8 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
     // Subscribe first to avoid missing the initial SIGNED_IN event on redirects
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.info("[Auth] onAuthStateChange", { event, hasSession: !!session, userId: session?.user?.id });
       setUser(session?.user ?? null);
       // Defer async operations to prevent deadlock
       if (session?.user) {
@@ -40,7 +41,8 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
     });
 
     // Then fetch any existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.info("[Auth] getSession result", { hasSession: !!session, error });
       setUser(session?.user ?? null);
       if (session?.user) {
         checkAdminRole(session.user.id);
@@ -62,7 +64,15 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    console.info("[Auth] Sign out clicked");
+    try {
+      const { error } = await supabase.auth.signOut();
+      console.info("[Auth] signOut completed", { error: error?.message });
+      const { data: { session } } = await supabase.auth.getSession();
+      console.info("[Auth] session after signOut", { hasSession: !!session });
+    } catch (err) {
+      console.error("[Auth] signOut threw", err);
+    }
     navigate("/");
   };
 
