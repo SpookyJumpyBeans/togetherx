@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useState, useMemo, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { DbProductCardWithPin, DbProduct } from "@/components/DbProductCardWithPin";
+import { toast } from "sonner";
 import { DbProductDetailDialog } from "@/components/DbProductDetailDialog";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { TARGET_AUDIENCE_SUGGESTIONS, CATEGORY_SUGGESTIONS, USER_RANGES, REVENUE_RANGES } from "@/data/tagSuggestions";
@@ -34,6 +35,7 @@ const Index = () => {
   const [dateFilter, setDateFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [approvedProducts, setApprovedProducts] = useState<any[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const PRODUCTS_PER_PAGE = 12;
 
   // Listen for custom event to reopen submit dialog after auth
@@ -53,6 +55,7 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
+    checkAdminStatus();
     let mounted = true;
     (async () => {
       const { data, error } = await supabase
@@ -72,6 +75,34 @@ const Index = () => {
     })();
     return () => { mounted = false; };
   }, []);
+
+  const checkAdminStatus = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      setIsAdmin(!!data);
+    }
+  };
+
+  const handleRejectProduct = async (productId: string) => {
+    const { error } = await supabase
+      .from('products')
+      .update({ approval_status: 'rejected' })
+      .eq('id', productId);
+
+    if (error) {
+      toast.error("Failed to reject product");
+      console.error('Error rejecting product:', error);
+    } else {
+      toast.success("Product rejected");
+      setApprovedProducts(prev => prev.filter(p => p.id !== productId));
+    }
+  };
 
   const filteredProducts = useMemo(() => {
     return approvedProducts.filter((product) => {
@@ -342,6 +373,8 @@ const Index = () => {
                 key={product.id}
                 product={product}
                 onClick={() => handleDbProductClick(product)}
+                isAdmin={isAdmin}
+                onReject={handleRejectProduct}
               />
             ))}
           </div>

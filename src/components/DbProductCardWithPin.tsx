@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pin, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { Pin, Sparkles, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -36,12 +36,15 @@ interface Props {
   onClick?: () => void;
   onUnpin?: (productId: string) => void;
   showUnpinButton?: boolean;
+  isAdmin?: boolean;
+  onReject?: (productId: string) => void;
 }
 
-export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButton }: Props) => {
+export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButton, isAdmin, onReject }: Props) => {
   const [isPinned, setIsPinned] = useState(false);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [rejectLoading, setRejectLoading] = useState(false);
 
   // Get the first image for the card cover
   const coverImage = product.screenshot_urls && product.screenshot_urls.length > 0 
@@ -109,6 +112,15 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
     }
 
     setLoading(false);
+  };
+
+  const handleReject = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!onReject) return;
+    
+    setRejectLoading(true);
+    await onReject(product.id);
+    setRejectLoading(false);
   };
 
   return (
@@ -224,6 +236,20 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
           </div>
         </CardContent>
       </Card>
+
+      {/* Admin Reject Button */}
+      {isAdmin && onReject && (
+        <Button
+          onClick={handleReject}
+          disabled={rejectLoading}
+          size="sm"
+          variant="destructive"
+          className="absolute top-3 left-3 rounded-md shadow-lg z-10 text-xs h-8 px-3"
+        >
+          <X className="w-3 h-3 mr-1" />
+          Reject
+        </Button>
+      )}
 
       {/* Pin/Unpin Button */}
       {user && showUnpinButton && isPinned ? (
