@@ -29,8 +29,11 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      // Defer async operations to prevent deadlock
       if (session?.user) {
-        checkAdminRole(session.user.id);
+        setTimeout(() => {
+          checkAdminRole(session.user.id);
+        }, 0);
       } else {
         setIsAdmin(false);
       }
@@ -86,10 +89,16 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
             </Link>
 
             {isAdmin && (
-              <Link to="/approvals" className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
-                <CheckSquare className="w-4 h-4" />
-                Approvals
-              </Link>
+              <>
+                <Link to="/approvals" className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+                  <CheckSquare className="w-4 h-4" />
+                  Product Approvals
+                </Link>
+                <Link to="/story-approvals" className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+                  <Trophy className="w-4 h-4" />
+                  Story Approvals
+                </Link>
+              </>
             )}
 
             <Button
@@ -123,16 +132,16 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                <DropdownMenuContent align="end" onCloseAutoFocus={(e) => e.preventDefault()}>
+                  <DropdownMenuItem onClick={() => navigate("/profile")} onSelect={(e) => e.preventDefault()}>
                     <User className="w-4 h-4 mr-2" />
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/my-products")}>
+                  <DropdownMenuItem onClick={() => navigate("/my-products")} onSelect={(e) => e.preventDefault()}>
                     <Package className="w-4 h-4 mr-2" />
                     My Products
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleSignOut}>
+                  <DropdownMenuItem onClick={handleSignOut} onSelect={(e) => e.preventDefault()}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign Out
                   </DropdownMenuItem>
