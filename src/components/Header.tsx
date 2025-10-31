@@ -86,10 +86,16 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
             </Link>
 
             {isAdmin && (
-              <Link to="/approvals" className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
-                <CheckSquare className="w-4 h-4" />
-                Approvals
-              </Link>
+              <>
+                <Link to="/approvals" className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+                  <CheckSquare className="w-4 h-4" />
+                  Product Approvals
+                </Link>
+                <Link to="/story-approvals" className="hidden md:flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors">
+                  <Trophy className="w-4 h-4" />
+                  Story Approvals
+                </Link>
+              </>
             )}
 
             <Button

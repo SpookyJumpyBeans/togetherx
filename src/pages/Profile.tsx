@@ -249,7 +249,7 @@ export default function Profile() {
         screenshotUrl = publicUrl;
       }
 
-      // Insert new story
+      // Insert new story with pending status
       const { error } = await supabase
         .from('success_stories')
         .insert([{
@@ -257,6 +257,7 @@ export default function Profile() {
           title: storyFormData.title,
           story: storyFormData.story,
           screenshot: screenshotUrl,
+          approval_status: 'pending',
         }]);
 
       if (error) throw error;
