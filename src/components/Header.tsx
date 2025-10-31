@@ -132,16 +132,16 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                <DropdownMenuContent align="end" onCloseAutoFocus={(e) => e.preventDefault()}>
+                  <DropdownMenuItem onClick={() => navigate("/profile")} onSelect={(e) => e.preventDefault()}>
                     <User className="w-4 h-4 mr-2" />
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/my-products")}>
+                  <DropdownMenuItem onClick={() => navigate("/my-products")} onSelect={(e) => e.preventDefault()}>
                     <Package className="w-4 h-4 mr-2" />
                     My Products
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleSignOut}>
+                  <DropdownMenuItem onClick={handleSignOut} onSelect={(e) => e.preventDefault()}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign Out
                   </DropdownMenuItem>
