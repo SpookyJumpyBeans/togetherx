@@ -16,10 +16,20 @@ export default function Auth() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const signedOut = searchParams.get('signedout') === '1';
 
   // Check if user is already logged in
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      // If we arrived here right after sign-out, do NOT auto-redirect away
+      if (signedOut) {
+        if (session) {
+          // Ensure any lingering local session is cleared
+          await supabase.auth.signOut({ scope: 'local' });
+        }
+        return; // Stay on Auth page
+      }
+
       if (session) {
         // Get redirect info from URL params or localStorage
         const returnTo = searchParams.get('returnTo') || localStorage.getItem('auth_return_to') || '/';
@@ -40,7 +50,7 @@ export default function Auth() {
         }
       }
     });
-  }, [navigate, searchParams]);
+  }, [navigate, searchParams, signedOut]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();

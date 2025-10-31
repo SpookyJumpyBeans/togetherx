@@ -66,14 +66,14 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
   const handleSignOut = async () => {
     console.info("[Auth] Sign out clicked");
     try {
-      const { error } = await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
       console.info("[Auth] signOut completed", { error: error?.message });
       const { data: { session } } = await supabase.auth.getSession();
       console.info("[Auth] session after signOut", { hasSession: !!session });
     } catch (err) {
       console.error("[Auth] signOut threw", err);
     }
-    navigate("/auth");
+    navigate("/auth?signedout=1");
   };
 
   return (
