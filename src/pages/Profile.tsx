@@ -145,7 +145,6 @@ export default function Profile() {
         .from("success_stories")
         .select("*")
         .eq("user_id", userId)
-        .eq("approval_status", "approved")
         .order("created_at", { ascending: false });
       
       if (error) throw error;
@@ -250,7 +249,7 @@ export default function Profile() {
         screenshotUrl = publicUrl;
       }
 
-      // Insert new story with pending status
+      // Insert new story
       const { error } = await supabase
         .from('success_stories')
         .insert([{
@@ -258,7 +257,6 @@ export default function Profile() {
           title: storyFormData.title,
           story: storyFormData.story,
           screenshot: screenshotUrl,
-          approval_status: 'pending',
         }]);
 
       if (error) throw error;
