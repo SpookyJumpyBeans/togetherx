@@ -263,7 +263,7 @@ export default function Profile() {
 
       if (error) throw error;
       
-      toast.success("Success story added!");
+      toast.success("Success story submitted! Waiting for approval!");
       
       // Reset form
       setStoryFormData({ title: "", story: "", screenshot: null });
