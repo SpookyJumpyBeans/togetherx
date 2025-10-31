@@ -29,8 +29,11 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      // Defer async operations to prevent deadlock
       if (session?.user) {
-        checkAdminRole(session.user.id);
+        setTimeout(() => {
+          checkAdminRole(session.user.id);
+        }, 0);
       } else {
         setIsAdmin(false);
       }
