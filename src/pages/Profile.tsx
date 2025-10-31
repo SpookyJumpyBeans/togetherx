@@ -145,6 +145,7 @@ export default function Profile() {
         .from("success_stories")
         .select("*")
         .eq("user_id", userId)
+        .eq("approval_status", "approved")
         .order("created_at", { ascending: false });
       
       if (error) throw error;

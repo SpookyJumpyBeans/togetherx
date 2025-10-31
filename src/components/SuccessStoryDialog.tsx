@@ -101,7 +101,7 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
         // Close dialog after reload
         onOpenChange(false);
       } else {
-        // Insert new story
+        // Insert new story with pending approval status
         const { data, error } = await supabase
           .from('success_stories')
           .insert([{
@@ -109,6 +109,7 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
             title: formData.title,
             story: formData.story,
             screenshot: screenshotUrl,
+            approval_status: 'pending',
           }])
           .select();
 
