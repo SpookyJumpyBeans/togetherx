@@ -491,7 +491,8 @@ export default function Approvals() {
       <DbProductDetailDialog 
         product={selectedProduct} 
         open={detailDialogOpen} 
-        onOpenChange={setDetailDialogOpen} 
+        onOpenChange={setDetailDialogOpen}
+        showProof={true}
       />
     </div>
   );

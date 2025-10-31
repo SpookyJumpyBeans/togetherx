@@ -44,9 +44,10 @@ interface DbProductDetailDialogProps {
   product: DbProduct | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  showProof?: boolean;
 }
 
-export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProductDetailDialogProps) => {
+export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof = false }: DbProductDetailDialogProps) => {
   const [user, setUser] = useState<any>(null);
   const [contacting, setContacting] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -302,8 +303,8 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange }: DbProduct
                     </div>
                   </div>
                   
-                  {/* Traction Proof Screenshots */}
-                  {(product?.users_screenshot_url || product?.revenue_screenshot_url || product?.growth_screenshot_url) && (
+                  {/* Traction Proof Screenshots - Only shown when showProof is true */}
+                  {showProof && (product?.users_screenshot_url || product?.revenue_screenshot_url || product?.growth_screenshot_url) && (
                     <div className="space-y-3 pt-3 border-t">
                       <h4 className="text-sm font-semibold text-muted-foreground">Traction Proof</h4>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
