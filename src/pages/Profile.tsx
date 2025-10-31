@@ -313,7 +313,7 @@ export default function Profile() {
               size="sm"
               className="rounded-md"
             >
-              {saving ? "Saving..." : "Edit Profile"}
+              {saving ? "Saving..." : "Save Profile"}
             </Button>
           </div>
 
