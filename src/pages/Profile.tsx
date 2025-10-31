@@ -36,6 +36,8 @@ export default function Profile() {
   const [editingStory, setEditingStory] = useState<any>(null);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
+  const [storyFormData, setStoryFormData] = useState({ title: "", story: "", screenshot: null as File | null });
+  const [submittingStory, setSubmittingStory] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -212,6 +214,65 @@ export default function Profile() {
     // Reload stories from database
     if (user) {
       await loadSuccessStories(user.id);
+    }
+  };
+
+  const handleSubmitStory = async () => {
+    if (!user) {
+      toast.error("Please sign in to submit a success story");
+      return;
+    }
+
+    if (!storyFormData.title.trim() || !storyFormData.story.trim()) {
+      toast.error("Please fill in both title and story");
+      return;
+    }
+
+    setSubmittingStory(true);
+
+    try {
+      // Upload screenshot if provided
+      let screenshotUrl = "";
+      if (storyFormData.screenshot) {
+        const fileExt = storyFormData.screenshot.name.split('.').pop();
+        const fileName = `${user.id}/${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, storyFormData.screenshot);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(fileName);
+        
+        screenshotUrl = publicUrl;
+      }
+
+      // Insert new story
+      const { error } = await supabase
+        .from('success_stories')
+        .insert([{
+          user_id: user.id,
+          title: storyFormData.title,
+          story: storyFormData.story,
+          screenshot: screenshotUrl,
+        }]);
+
+      if (error) throw error;
+      
+      toast.success("Success story added!");
+      
+      // Reset form
+      setStoryFormData({ title: "", story: "", screenshot: null });
+      
+      // Reload stories
+      await loadSuccessStories(user.id);
+    } catch (error: any) {
+      console.error("Story save error:", error);
+      toast.error("Failed to add story: " + error.message);
+    } finally {
+      setSubmittingStory(false);
     }
   };
 
@@ -414,6 +475,8 @@ export default function Profile() {
               </Label>
               <Input
                 id="story-title"
+                value={storyFormData.title}
+                onChange={(e) => setStoryFormData({ ...storyFormData, title: e.target.value })}
                 placeholder="E.g., Found the perfect co-marketing partner"
                 className="bg-background"
               />
@@ -426,6 +489,8 @@ export default function Profile() {
               <div className="relative">
                 <textarea
                   id="story-text"
+                  value={storyFormData.story}
+                  onChange={(e) => setStoryFormData({ ...storyFormData, story: e.target.value })}
                   placeholder="Share your experience and the outcome..."
                   className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                 />
@@ -436,17 +501,30 @@ export default function Profile() {
               <Label className="text-sm font-medium mb-2 block">
                 Screenshot (Optional)
               </Label>
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setStoryFormData({ ...storyFormData, screenshot: e.target.files?.[0] || null })}
+                className="hidden"
+                id="story-screenshot"
+              />
+              <label
+                htmlFor="story-screenshot"
+                className="border-2 border-dashed border-border rounded-lg p-8 text-center bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer block"
+              >
                 <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Click to upload an image</p>
-              </div>
+                <p className="text-sm text-muted-foreground">
+                  {storyFormData.screenshot ? storyFormData.screenshot.name : "Click to upload an image"}
+                </p>
+              </label>
             </div>
 
             <Button
-              onClick={() => setStoryDialogOpen(true)}
+              onClick={handleSubmitStory}
+              disabled={submittingStory}
               className="w-full rounded-md bg-foreground text-background hover:bg-foreground/90"
             >
-              Submit Story
+              {submittingStory ? "Submitting..." : "Submit Story"}
             </Button>
           </div>
 
