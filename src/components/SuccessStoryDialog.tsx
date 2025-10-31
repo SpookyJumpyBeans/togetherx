@@ -45,7 +45,9 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
     e.preventDefault();
     setLoading(true);
 
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) {
       toast.error("Please sign in to submit a success story");
       setLoading(false);
@@ -56,84 +58,86 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
       // Upload screenshot if provided
       let screenshotUrl = editingStory?.screenshot || "";
       if (formData.screenshot) {
-        const fileExt = formData.screenshot.name.split('.').pop();
+        const fileExt = formData.screenshot.name.split(".").pop();
         const fileName = `${session.user.id}/${Math.random()}.${fileExt}`;
         const { error: uploadError } = await supabase.storage
-          .from('product-images')
+          .from("product-images")
           .upload(fileName, formData.screenshot);
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(fileName);
-        
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("product-images").getPublicUrl(fileName);
+
         screenshotUrl = publicUrl;
       }
 
       if (editingStory) {
         // Update existing story
         const { data, error } = await supabase
-          .from('success_stories')
+          .from("success_stories")
           .update({
             title: formData.title,
             story: formData.story,
             screenshot: screenshotUrl,
           })
-          .eq('id', editingStory.id)
-          .eq('user_id', session.user.id)
+          .eq("id", editingStory.id)
+          .eq("user_id", session.user.id)
           .select();
 
         if (error) {
           console.error("Update error:", error);
           throw error;
         }
-        
+
         console.log("Update successful:", data);
         toast.success("Success story updated!");
-        
+
         // Reset form
         setFormData({ title: "", story: "", screenshot: null });
-        
+
         // Call onSuccess to reload data BEFORE closing dialog
         await onSuccess?.();
-        
+
         // Close dialog after reload
         onOpenChange(false);
       } else {
         // Insert new story with pending approval status
         const { data, error } = await supabase
-          .from('success_stories')
-          .insert([{
-            user_id: session.user.id,
-            title: formData.title,
-            story: formData.story,
-            screenshot: screenshotUrl,
-            approval_status: 'pending',
-          }])
+          .from("success_stories")
+          .insert([
+            {
+              user_id: session.user.id,
+              title: formData.title,
+              story: formData.story,
+              screenshot: screenshotUrl,
+              approval_status: "pending",
+            },
+          ])
           .select();
 
         if (error) {
           console.error("Insert error:", error);
           throw error;
         }
-        
+
         console.log("Insert successful:", data);
-        toast.success("Success story added!");
-        
+        toast.success("Success story submitted! Waiting for approval!");
+
         // Reset form
         setFormData({ title: "", story: "", screenshot: null });
-        
+
         // Call onSuccess to reload data BEFORE closing dialog
         await onSuccess?.();
-        
+
         // Close dialog after reload
         onOpenChange(false);
       }
     } catch (error: any) {
       console.error("Story save error:", error);
-      toast.error(editingStory ? "Failed to update story" : "Failed to add story", { 
-        description: error.message 
+      toast.error(editingStory ? "Failed to update story" : "Failed to add story", {
+        description: error.message,
       });
     } finally {
       setLoading(false);
@@ -190,9 +194,7 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
           </div>
 
           <div>
-            <Label className="text-sm font-medium mb-3 block">
-              Screenshot (Optional)
-            </Label>
+            <Label className="text-sm font-medium mb-3 block">Screenshot (Optional)</Label>
             <input
               type="file"
               accept="image/*"
@@ -213,13 +215,14 @@ export const SuccessStoryDialog = ({ open, onOpenChange, editingStory, onSuccess
             </label>
           </div>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            size="lg"
-            className="w-full rounded-full"
-          >
-            {loading ? (editingStory ? "Updating..." : "Submitting...") : (editingStory ? "Update Success Story" : "Submit Success Story")}
+          <Button type="submit" disabled={loading} size="lg" className="w-full rounded-full">
+            {loading
+              ? editingStory
+                ? "Updating..."
+                : "Submitting..."
+              : editingStory
+                ? "Update Success Story"
+                : "Submit Success Story"}
           </Button>
         </form>
       </DialogContent>
