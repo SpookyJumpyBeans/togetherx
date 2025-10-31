@@ -73,7 +73,7 @@ export const Header = ({ onSubmitClick, onSubscribeClick }: HeaderProps) => {
     } catch (err) {
       console.error("[Auth] signOut threw", err);
     }
-    navigate("/");
+    navigate("/auth");
   };
 
   return (
