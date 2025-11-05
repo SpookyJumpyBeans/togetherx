@@ -169,9 +169,8 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
                   </div>
                 )}
                 {product.revenue && (
-                  <div>
-                    <span className="font-medium">{product.revenue}</span>
-                    <span className="text-muted-foreground ml-1">MRR</span>
+                  <div className="text-muted-foreground">
+                    {product.revenue}
                   </div>
                 )}
               </div>
