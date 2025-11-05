@@ -129,52 +129,70 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
         className="group hover:shadow-xl transition-all duration-300 border border-border bg-card overflow-hidden cursor-pointer rounded-xl h-full flex flex-col"
         onClick={onClick}
       >
-        <CardContent className="p-6 flex flex-col h-full gap-4">
-          {/* Product Name */}
-          <div>
-            <h3 className="font-semibold text-lg leading-tight">{product.name}</h3>
+        <CardContent className="p-0 flex flex-col h-full">
+          {/* Product Screenshot */}
+          <div className="w-full aspect-[4/3] overflow-hidden bg-muted/10 relative">
+            <img
+              src={coverImage}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
           </div>
+          
+          <div className="p-5 flex flex-col gap-4 flex-1">
+            {/* Logo + Name */}
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
+                <img
+                  src={product.logo_url || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&h=100&fit=crop"}
+                  alt={`${product.name} logo`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <h3 className="font-semibold text-base leading-tight">{product.name}</h3>
+            </div>
 
-          {/* Description */}
-          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 flex-1">
-            {product.description || "No description provided"}
-          </p>
+            {/* Description */}
+            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 flex-1">
+              {product.description || "No description provided"}
+            </p>
 
-          {/* Traction Metrics */}
-          {(product.users || product.revenue) && (
-            <div className="flex items-center gap-4 text-sm">
-              {product.users && (
-                <div>
-                  <span className="font-medium">{product.users}</span>
-                  <span className="text-muted-foreground ml-1">users</span>
-                </div>
+            {/* Traction Metrics */}
+            {(product.users || product.revenue) && (
+              <div className="flex items-center gap-4 text-sm">
+                {product.users && (
+                  <div>
+                    <span className="font-medium">{product.users}</span>
+                    <span className="text-muted-foreground ml-1">users</span>
+                  </div>
+                )}
+                {product.revenue && (
+                  <div>
+                    <span className="font-medium">{product.revenue}</span>
+                    <span className="text-muted-foreground ml-1">MRR</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Category & Partnership Tags */}
+            <div className="flex flex-wrap gap-1.5">
+              {product.category && (
+                <span className="px-2.5 py-1 bg-secondary text-secondary-foreground rounded-full text-xs font-medium">
+                  {product.category.split(',')[0].trim()}
+                </span>
               )}
-              {product.revenue && (
-                <div>
-                  <span className="font-medium">{product.revenue}</span>
-                  <span className="text-muted-foreground ml-1">MRR</span>
-                </div>
+              {product.white_label && (
+                <span className="px-2.5 py-1 bg-purple-500/10 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium">
+                  White-label
+                </span>
+              )}
+              {product.reseller && (
+                <span className="px-2.5 py-1 bg-green-500/10 text-green-700 dark:text-green-300 rounded-full text-xs font-medium">
+                  Reseller
+                </span>
               )}
             </div>
-          )}
-
-          {/* Category & Partnership Tags */}
-          <div className="flex flex-wrap gap-1.5">
-            {product.category && (
-              <span className="px-2.5 py-1 bg-secondary text-secondary-foreground rounded-full text-xs font-medium">
-                {product.category.split(',')[0].trim()}
-              </span>
-            )}
-            {product.white_label && (
-              <span className="px-2.5 py-1 bg-purple-500/10 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium">
-                White-label
-              </span>
-            )}
-            {product.reseller && (
-              <span className="px-2.5 py-1 bg-green-500/10 text-green-700 dark:text-green-300 rounded-full text-xs font-medium">
-                Reseller
-              </span>
-            )}
           </div>
         </CardContent>
       </Card>
