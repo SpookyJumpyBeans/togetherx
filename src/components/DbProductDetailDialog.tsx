@@ -261,108 +261,106 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof =
               </div>
 
               {/* Tags */}
-              {product?.tags && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-muted-foreground">Tags</h3>
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-muted-foreground">Tags</h3>
+                {product?.tags ? (
                   <div className="flex flex-wrap gap-2">
                     {product.tags.split(',').map((tag, i) => (
                       <Badge key={i} variant="outline">{tag.trim()}</Badge>
                     ))}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <p className="text-muted-foreground">Not specified</p>
+                )}
+              </div>
 
               {/* Tech Highlights */}
-              {product?.tech_highlights && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-semibold text-muted-foreground">Technology Stack</h3>
-                  </div>
-                  <p className="text-sm">{product.tech_highlights}</p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground">Technology Stack</h3>
                 </div>
-              )}
+                <p className="text-sm">{product?.tech_highlights || "Not specified"}</p>
+              </div>
 
-              {/* Traction Metrics */}
-              {(product?.users || product?.revenue || product?.growth_rate) && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-semibold">Traction</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Users/DAU/MAU</p>
-                      <p className="font-medium">{product.users || "Not disclosed"}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Revenue</p>
-                      <p className="font-medium">{product.revenue || "Not disclosed"}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Growth Rate</p>
-                      <p className="font-medium">{product.growth_rate || "Not disclosed"}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Traction Proof Screenshots - Only shown when showProof is true */}
-                  {showProof && (product?.users_screenshot_url || product?.revenue_screenshot_url || product?.growth_screenshot_url) && (
-                    <div className="space-y-3 pt-3 border-t">
-                      <h4 className="text-sm font-semibold text-muted-foreground">Traction Proof</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {product.users_screenshot_url && (
-                          <div className="space-y-2">
-                            <p className="text-xs text-muted-foreground">Users Proof</p>
-                            <img 
-                              src={product.users_screenshot_url} 
-                              alt="Users proof" 
-                              className="w-full h-32 object-cover rounded-lg border"
-                            />
-                          </div>
-                        )}
-                        {product.revenue_screenshot_url && (
-                          <div className="space-y-2">
-                            <p className="text-xs text-muted-foreground">Revenue Proof</p>
-                            <img 
-                              src={product.revenue_screenshot_url} 
-                              alt="Revenue proof" 
-                              className="w-full h-32 object-cover rounded-lg border"
-                            />
-                          </div>
-                        )}
-                        {product.growth_screenshot_url && (
-                          <div className="space-y-2">
-                            <p className="text-xs text-muted-foreground">Growth Proof</p>
-                            <img 
-                              src={product.growth_screenshot_url} 
-                              alt="Growth proof" 
-                              className="w-full h-32 object-cover rounded-lg border"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+              {/* Traction Metrics - Always shown */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold">Traction</h3>
                 </div>
-              )}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Users/DAU/MAU</p>
+                    <p className="font-medium">{product?.users || "Not disclosed"}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Revenue</p>
+                    <p className="font-medium">{product?.revenue || "Not disclosed"}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Growth Rate</p>
+                    <p className="font-medium">{product?.growth_rate || "Not disclosed"}</p>
+                  </div>
+                </div>
+                
+                {/* Traction Proof Screenshots - Only shown when showProof is true */}
+                {showProof && (product?.users_screenshot_url || product?.revenue_screenshot_url || product?.growth_screenshot_url) && (
+                  <div className="space-y-3 pt-3 border-t">
+                    <h4 className="text-sm font-semibold text-muted-foreground">Traction Proof</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {product.users_screenshot_url && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">Users Proof</p>
+                          <img 
+                            src={product.users_screenshot_url} 
+                            alt="Users proof" 
+                            className="w-full h-32 object-cover rounded-lg border"
+                          />
+                        </div>
+                      )}
+                      {product.revenue_screenshot_url && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">Revenue Proof</p>
+                          <img 
+                            src={product.revenue_screenshot_url} 
+                            alt="Revenue proof" 
+                            className="w-full h-32 object-cover rounded-lg border"
+                          />
+                        </div>
+                      )}
+                      {product.growth_screenshot_url && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">Growth Proof</p>
+                          <img 
+                            src={product.growth_screenshot_url} 
+                            alt="Growth proof" 
+                            className="w-full h-32 object-cover rounded-lg border"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
 
-              {/* Partnership Types */}
-              {partnershipTypes.length > 0 && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-muted-foreground">Partnership Interests</h3>
+              {/* Partnership Types - Always shown */}
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-muted-foreground">Partnership Interests</h3>
+                {partnershipTypes.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {partnershipTypes.map((type) => (
                       <Badge key={type.key}>{type.label}</Badge>
                     ))}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <p className="text-muted-foreground">Not specified</p>
+                )}
+              </div>
 
               {/* Acquisition Details */}
-              {product?.acquisition_details && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-muted-foreground">Acquisition Details</h3>
-                  <p className="text-sm">{product.acquisition_details}</p>
-                </div>
-              )}
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-muted-foreground">Acquisition Details</h3>
+                <p className="text-sm">{product?.acquisition_details || "Not specified"}</p>
+              </div>
 
               {/* Website Link */}
               <div className="space-y-2">
