@@ -15,7 +15,7 @@ export const PartnershipBadges = ({ partnerships }: PartnershipBadgesProps) => {
 
   if (partnerships.coMarketing) {
     badges.push(
-      <Badge key="marketing" variant="warning" className="gap-1 text-xs">
+      <Badge key="marketing" className="gap-1 text-xs bg-foreground text-background hover:bg-foreground/90 border-foreground">
         <Handshake className="w-3 h-3" />
         Co-Marketing
       </Badge>
@@ -24,7 +24,7 @@ export const PartnershipBadges = ({ partnerships }: PartnershipBadgesProps) => {
 
   if (partnerships.whiteLabel) {
     badges.push(
-      <Badge key="whitelabel" variant="whitelabel" className="gap-1 text-xs">
+      <Badge key="whitelabel" className="gap-1 text-xs bg-foreground text-background hover:bg-foreground/90 border-foreground">
         <Package className="w-3 h-3" />
         White Label
       </Badge>
@@ -33,7 +33,7 @@ export const PartnershipBadges = ({ partnerships }: PartnershipBadgesProps) => {
 
   if (partnerships.acquisition) {
     badges.push(
-      <Badge key="acquisition" variant="acquisition" className="gap-1 text-xs">
+      <Badge key="acquisition" className="gap-1 text-xs bg-foreground text-background hover:bg-foreground/90 border-foreground">
         <DollarSign className="w-3 h-3" />
         Open to Offers
       </Badge>
@@ -42,7 +42,7 @@ export const PartnershipBadges = ({ partnerships }: PartnershipBadgesProps) => {
 
   if (partnerships.reseller) {
     badges.push(
-      <Badge key="reseller" variant="reseller" className="gap-1 text-xs">
+      <Badge key="reseller" className="gap-1 text-xs bg-foreground text-background hover:bg-foreground/90 border-foreground">
         <Store className="w-3 h-3" />
         Reseller
       </Badge>
