@@ -209,7 +209,7 @@ const Index = () => {
       />
       
       {/* Hero Section */}
-      <section className="bg-muted/30 py-20 md:py-32 relative overflow-hidden">
+      <section className="bg-muted/30 py-28 md:py-40 relative overflow-hidden">
         <ParticleBackground />
         <div className="container mx-auto px-6 md:px-8 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-6">
@@ -228,7 +228,7 @@ const Index = () => {
       </section>
 
       {/* Filters Section */}
-      <section className="container mx-auto px-6 md:px-8 py-6">
+      <section className="container mx-auto px-6 md:px-8 py-10">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-wrap items-center gap-3">
             {/* Category Filter */}
@@ -367,7 +367,7 @@ const Index = () => {
       {/* Products Grid */}
       <section id="products" className="container mx-auto px-6 md:px-8 pb-20 flex-1">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {displayedProducts.map((product) => (
               <DbProductCardWithPin
                 key={product.id}
