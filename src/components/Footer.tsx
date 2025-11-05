@@ -6,7 +6,7 @@ interface FooterProps {
 
 export const Footer = ({ onContactClick }: FooterProps) => {
   return (
-    <footer className="border-t border-border/30 py-12 mt-24">
+    <footer className="border-t border-border/30 py-6 mt-8">
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
           <p className="text-sm text-muted-foreground">

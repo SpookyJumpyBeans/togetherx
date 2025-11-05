@@ -5,11 +5,13 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DbProductCardWithPin } from "@/components/DbProductCardWithPin";
+import { DbProductCardWithPin, DbProduct } from "@/components/DbProductCardWithPin";
+import { DbProductDetailDialog } from "@/components/DbProductDetailDialog";
 import { SuccessStoryDialog } from "@/components/SuccessStoryDialog";
 import { SuccessStoryDetailDialog } from "@/components/SuccessStoryDetailDialog";
 import { EnhancedSubmitDialog } from "@/components/EnhancedSubmitDialog";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { ContactDialog } from "@/components/ContactDialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { User, Save, Pin, Trophy, Linkedin, Github, Globe, Twitter, Edit, Trash2, Upload } from "lucide-react";
@@ -36,6 +38,9 @@ export default function Profile() {
   const [editingStory, setEditingStory] = useState<any>(null);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
+  const [contactDialogOpen, setContactDialogOpen] = useState(false);
+  const [selectedDbProduct, setSelectedDbProduct] = useState<DbProduct | null>(null);
+  const [dbDetailDialogOpen, setDbDetailDialogOpen] = useState(false);
   const [storyFormData, setStoryFormData] = useState({ title: "", story: "", screenshot: null as File | null });
   const [submittingStory, setSubmittingStory] = useState(false);
   const navigate = useNavigate();
@@ -456,6 +461,10 @@ export default function Profile() {
                     product={product} 
                     showUnpinButton={true}
                     onUnpin={handleUnpin}
+                    onClick={() => {
+                      setSelectedDbProduct(product);
+                      setDbDetailDialogOpen(true);
+                    }}
                   />
                 </div>
               ))}
@@ -583,7 +592,7 @@ export default function Profile() {
         </section>
       </main>
 
-      <Footer />
+      <Footer onContactClick={() => setContactDialogOpen(true)} />
 
       <SuccessStoryDetailDialog
         open={storyDetailOpen}
@@ -598,6 +607,12 @@ export default function Profile() {
       />
       <EnhancedSubmitDialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen} />
       <SubscribeDialog open={subscribeDialogOpen} onOpenChange={setSubscribeDialogOpen} />
+      <ContactDialog open={contactDialogOpen} onOpenChange={setContactDialogOpen} />
+      <DbProductDetailDialog
+        open={dbDetailDialogOpen}
+        onOpenChange={setDbDetailDialogOpen}
+        product={selectedDbProduct}
+      />
     </div>
   );
 }
