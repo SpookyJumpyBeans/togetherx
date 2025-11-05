@@ -228,8 +228,8 @@ const Index = () => {
       </section>
 
       {/* Filters Section */}
-      <section className="container mx-auto px-6 md:px-8 py-10">
-        <div className="max-w-7xl mx-auto">
+      <section className="container mx-auto px-6 md:px-8 py-12">
+        <div>
           <div className="flex flex-wrap items-center gap-3">
             {/* Category Filter */}
             <Popover>
@@ -365,9 +365,9 @@ const Index = () => {
       </section>
 
       {/* Products Grid */}
-      <section id="products" className="container mx-auto px-6 md:px-8 pb-8 flex-1">
+      <section id="products" className="px-6 md:px-8 pb-6 flex-1">
         <div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {displayedProducts.map((product) => (
               <DbProductCardWithPin
                 key={product.id}
@@ -386,7 +386,7 @@ const Index = () => {
           )}
 
           {totalPages > 1 && (
-            <div className="mt-12">
+            <div className="mt-8 mb-4">
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
