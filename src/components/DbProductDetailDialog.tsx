@@ -279,7 +279,7 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof =
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-semibold text-muted-foreground">Technology Stack</h3>
                 </div>
-                <p className="text-sm font-semibold">{product?.tech_highlights || "Not specified"}</p>
+                <p className="font-semibold">{product?.tech_highlights || "Not specified"}</p>
               </div>
 
               {/* Traction Metrics - Always shown */}
@@ -359,7 +359,7 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof =
               {/* Acquisition Details */}
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-muted-foreground">Acquisition Details</h3>
-                <p className="text-sm font-semibold">{product?.acquisition_details || "Not specified"}</p>
+                <p className="font-semibold">{product?.acquisition_details || "Not specified"}</p>
               </div>
 
               {/* Website Link */}
