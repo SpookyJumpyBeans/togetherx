@@ -252,11 +252,11 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof =
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <h3 className="text-sm font-semibold text-muted-foreground">Category</h3>
-                  <p>{product?.category || "Not specified"}</p>
+                  <p className="font-semibold">{product?.category || "Not specified"}</p>
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-sm font-semibold text-muted-foreground">Target Audience</h3>
-                  <p>{product?.target_audience || "Not specified"}</p>
+                  <p className="font-semibold">{product?.target_audience || "Not specified"}</p>
                 </div>
               </div>
 
@@ -270,7 +270,7 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof =
                     ))}
                   </div>
                 ) : (
-                  <p className="text-muted-foreground">Not specified</p>
+                  <p className="font-semibold">Not specified</p>
                 )}
               </div>
 
@@ -279,7 +279,7 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof =
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-semibold text-muted-foreground">Technology Stack</h3>
                 </div>
-                <p className="text-sm">{product?.tech_highlights || "Not specified"}</p>
+                <p className="text-sm font-semibold">{product?.tech_highlights || "Not specified"}</p>
               </div>
 
               {/* Traction Metrics - Always shown */}
@@ -290,15 +290,15 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof =
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Users/DAU/MAU</p>
-                    <p className="font-medium">{product?.users || "Not disclosed"}</p>
+                    <p className="font-semibold">{product?.users || "Not disclosed"}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Revenue</p>
-                    <p className="font-medium">{product?.revenue || "Not disclosed"}</p>
+                    <p className="font-semibold">{product?.revenue || "Not disclosed"}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Growth Rate</p>
-                    <p className="font-medium">{product?.growth_rate || "Not disclosed"}</p>
+                    <p className="font-semibold">{product?.growth_rate || "Not disclosed"}</p>
                   </div>
                 </div>
                 
@@ -352,14 +352,14 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof =
                     ))}
                   </div>
                 ) : (
-                  <p className="text-muted-foreground">Not specified</p>
+                  <p className="font-semibold">Not specified</p>
                 )}
               </div>
 
               {/* Acquisition Details */}
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-muted-foreground">Acquisition Details</h3>
-                <p className="text-sm">{product?.acquisition_details || "Not specified"}</p>
+                <p className="text-sm font-semibold">{product?.acquisition_details || "Not specified"}</p>
               </div>
 
               {/* Website Link */}
@@ -370,13 +370,13 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof =
                     href={product.website_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-primary hover:underline"
+                    className="flex items-center gap-2 text-primary hover:underline font-semibold"
                   >
                     <Globe className="w-4 h-4" />
                     {product.website_link}
                   </a>
                 ) : (
-                  <p className="text-muted-foreground">Not provided</p>
+                  <p className="font-semibold">Not provided</p>
                 )}
               </div>
 
