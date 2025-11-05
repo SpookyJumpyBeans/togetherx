@@ -129,109 +129,51 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
         className="group hover:shadow-xl transition-all duration-300 border border-border bg-card overflow-hidden cursor-pointer rounded-xl h-full flex flex-col"
         onClick={onClick}
       >
-        <CardContent className="p-0 flex flex-col h-full">
-          {/* Product Image */}
-          <div className="w-full aspect-[4/3] overflow-hidden bg-muted/10 relative">
-            <img
-              src={coverImage}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-            {/* Badges on Image */}
-            <div className="absolute top-3 left-3 flex gap-2">
-              {product.uses_ai && (
-                <div className="bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  <span className="text-xs font-medium">AI</span>
+        <CardContent className="p-6 flex flex-col h-full gap-4">
+          {/* Product Name */}
+          <div>
+            <h3 className="font-semibold text-lg leading-tight">{product.name}</h3>
+          </div>
+
+          {/* Description */}
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 flex-1">
+            {product.description || "No description provided"}
+          </p>
+
+          {/* Traction Metrics */}
+          {(product.users || product.revenue) && (
+            <div className="flex items-center gap-4 text-sm">
+              {product.users && (
+                <div>
+                  <span className="font-medium">{product.users}</span>
+                  <span className="text-muted-foreground ml-1">users</span>
+                </div>
+              )}
+              {product.revenue && (
+                <div>
+                  <span className="font-medium">{product.revenue}</span>
+                  <span className="text-muted-foreground ml-1">MRR</span>
                 </div>
               )}
             </div>
-          </div>
-          
-          <div className="p-5 flex-1 flex flex-col">
-            {/* Header: Logo + Name */}
-            <div className="flex items-start gap-3 mb-2">
-              <div className="w-10 h-10 rounded-md overflow-hidden bg-muted flex items-center justify-center">
-                <img
-                  src={product.logo_url || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&h=100&fit=crop"}
-                  alt={`${product.name} logo`}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-base leading-tight truncate">{product.name}</h3>
-              </div>
-            </div>
+          )}
 
-            {/* Description */}
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {product.description || "No description provided"}
-            </p>
-
-            {/* Basic Info */}
-            {(product.category || product.target_audience) && (
-              <div className="grid grid-cols-2 gap-3 text-xs mt-3">
-                <div><span className="font-medium">Category:</span> {product.category || "N/A"}</div>
-                <div><span className="font-medium">Audience:</span> {product.target_audience || "N/A"}</div>
-              </div>
+          {/* Category & Partnership Tags */}
+          <div className="flex flex-wrap gap-1.5">
+            {product.category && (
+              <span className="px-2.5 py-1 bg-secondary text-secondary-foreground rounded-full text-xs font-medium">
+                {product.category.split(',')[0].trim()}
+              </span>
             )}
-
-            {/* Technology Highlights */}
-            {product.tech_highlights && (
-              <div className="mt-3">
-                <div className="text-xs font-medium mb-1">Technology Highlights</div>
-                <p className="text-xs text-muted-foreground">{product.tech_highlights}</p>
-              </div>
+            {product.white_label && (
+              <span className="px-2.5 py-1 bg-purple-500/10 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium">
+                White-label
+              </span>
             )}
-
-            {/* Traction Metrics */}
-            {(product.users || product.revenue || product.growth_rate) && (
-              <div className="mt-3">
-                <div className="text-xs font-medium mb-1">Traction</div>
-                <div className="grid grid-cols-3 gap-3 text-xs">
-                  <div>
-                    <div className="text-muted-foreground">Total Users</div>
-                    <div className="font-medium">{product.users || "N/A"}</div>
-                  </div>
-                  <div>
-                    <div className="text-muted-foreground">Monthly Active</div>
-                    <div className="font-medium">{product.growth_rate || "N/A"}</div>
-                  </div>
-                  <div>
-                    <div className="text-muted-foreground">Revenue</div>
-                    <div className="font-medium">{product.revenue || "N/A"}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Partnership Opportunities */}
-            {(product.partnership || product.co_marketing || product.white_label || product.reseller || product.acquisition) && (
-              <div className="mt-3">
-                <div className="text-xs font-medium mb-1">Partnership Opportunities</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {product.partnership && <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px]">General Partnership</span>}
-                  {product.co_marketing && <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px]">Co-marketing</span>}
-                  {product.white_label && <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px]">White Label</span>}
-                  {product.reseller && <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px]">Reseller</span>}
-                  {product.acquisition && <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px]">Acquisition</span>}
-                </div>
-              </div>
-            )}
-
-            {/* Acquisition Details */}
-            {product.acquisition_details && (
-              <div className="mt-3">
-                <div className="text-xs font-medium mb-1">Acquisition Details</div>
-                <p className="text-xs text-muted-foreground">{product.acquisition_details}</p>
-              </div>
-            )}
-
-            {/* Tags */}
-            {product.tags && (
-              <div className="mt-3 text-xs">
-                <span className="font-medium">Tags:</span> {product.tags}
-              </div>
+            {product.reseller && (
+              <span className="px-2.5 py-1 bg-green-500/10 text-green-700 dark:text-green-300 rounded-full text-xs font-medium">
+                Reseller
+              </span>
             )}
           </div>
         </CardContent>
