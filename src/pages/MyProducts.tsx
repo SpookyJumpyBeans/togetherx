@@ -142,6 +142,13 @@ export default function MyProducts() {
             <p className="text-sm text-muted-foreground mt-2">
               Submit your first product to get started
             </p>
+            <Button 
+              onClick={() => setSubmitDialogOpen(true)}
+              size="lg"
+              className="mt-6"
+            >
+              Submit Product
+            </Button>
           </div>
         ) : (
           <div className="space-y-6">

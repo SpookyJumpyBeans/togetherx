@@ -266,7 +266,7 @@ export const DbProductDetailDialog = ({ product, open, onOpenChange, showProof =
                 {product?.tags ? (
                   <div className="flex flex-wrap gap-2">
                     {product.tags.split(',').map((tag, i) => (
-                      <Badge key={i} variant="outline">{tag.trim()}</Badge>
+                      <Badge key={i} className="bg-foreground text-background hover:bg-foreground/90 border-foreground">{tag.trim()}</Badge>
                     ))}
                   </div>
                 ) : (
