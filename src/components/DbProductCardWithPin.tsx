@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Pin, Sparkles, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export interface DbProduct {
   id: string;
@@ -45,6 +46,7 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [rejectLoading, setRejectLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Get the first image for the card cover
   const coverImage = product.screenshot_urls && product.screenshot_urls.length > 0 
@@ -79,7 +81,7 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
   const togglePin = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) {
-      toast.error("Please sign in to pin products");
+      navigate("/auth");
       return;
     }
     setLoading(true);
@@ -212,7 +214,7 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
       )}
 
       {/* Pin/Unpin Button */}
-      {user && showUnpinButton && isPinned ? (
+      {showUnpinButton && isPinned ? (
         <Button
           onClick={togglePin}
           disabled={loading}
@@ -222,7 +224,7 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
         >
           Unpin
         </Button>
-      ) : user && !showUnpinButton ? (
+      ) : !showUnpinButton ? (
         <Button
           onClick={togglePin}
           disabled={loading}
