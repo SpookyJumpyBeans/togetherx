@@ -161,16 +161,17 @@ export const DbProductCardWithPin = ({ product, onClick, onUnpin, showUnpinButto
 
             {/* Traction Metrics */}
             {(product.users || product.revenue) && (
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-4 text-sm">
                 {product.users && (
                   <div>
-                    <span className="font-medium text-foreground">{product.users}</span>
-                    <span className="ml-1">users</span>
+                    <span className="font-medium">{product.users}</span>
+                    <span className="text-muted-foreground ml-1">users</span>
                   </div>
                 )}
                 {product.revenue && (
                   <div>
-                    <span>{product.revenue}</span>
+                    <span className="font-medium">{product.revenue}</span>
+                    <span className="text-muted-foreground ml-1">MRR</span>
                   </div>
                 )}
               </div>
